@@ -1,14 +1,12 @@
 export function getTodayKey() {
-  const now = new Date();
-  const bd = new Date(now.getTime() + 6 * 60 * 60 * 1000);
-  return bd.toISOString().split('T')[0];
+  return new Date().toLocaleDateString('en-CA', { timeZone: 'Asia/Dhaka' });
 }
 
 export function formatDisplay(dateStr) {
   if (!dateStr) return '';
-  const d = new Date(dateStr + 'T00:00:00+06:00');
-  return d.toLocaleDateString('en-GB', {
+  return new Date(dateStr + 'T00:00:00').toLocaleDateString('en-GB', {
     day: 'numeric', month: 'long', year: 'numeric',
+    timeZone: 'Asia/Dhaka',
   });
 }
 

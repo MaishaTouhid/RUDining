@@ -88,36 +88,52 @@ export default function MenuEditorScreen() {
       [activeMeal]: { ...prev[activeMeal], [field]: value },
     }));
   }
-
-  async function handleSave() {
-    setSaving(true);
-    try {
-      const cleaned = {};
-      MEALS.forEach(m => {
-        cleaned[m] = {
-          ...meals[m],
-          items: meals[m].items
-            .filter(it => it.name.trim())
-            .map(it => ({
-              name: it.name.trim(),
-              price: Number(it.price) || 0,
-              count: it.count === '' ? null : Number(it.count),
-              status: it.status,
-            })),
-        };
-      });
-      await saveDiningMenu(String(hallId), today, cleaned, String(moderatorName));
-      await logUpdate(String(hallId), String(moderatorName), 'dining', 'Updated dining menu');
-      router.replace({
-        pathname: '/SuccessScreen',
-        params: { hallId, hallName, role, moderatorName },
-      });
-    } catch (e) {
-      Alert.alert('Error', 'Could not save menu. Try again.');
-    } finally {
-      setSaving(false);
+async function handleSave() {
+  // Validation
+  for (const m of MEALS) {
+    for (const item of meals[m].items) {
+      if (!item.name.trim()) continue;
+      const price = Number(item.price);
+      const count = item.count === '' ? null : Number(item.count);
+      if (isNaN(price) || price < 0) {
+        Alert.alert('Invalid Input', `"${item.name}"-এর price সঠিক নয়।`);
+        return;
+      }
+      if (count !== null && (isNaN(count) || count < 0)) {
+        Alert.alert('Invalid Input', `"${item.name}"-এর count সঠিক নয়।`);
+        return;
+      }
     }
   }
+
+  setSaving(true);
+  try {
+    const cleaned = {};
+    MEALS.forEach(m => {
+      cleaned[m] = {
+        ...meals[m],
+        items: meals[m].items
+          .filter(it => it.name.trim())
+          .map(it => ({
+            name: it.name.trim(),
+            price: Math.max(0, Number(it.price) || 0),
+            count: it.count === '' ? null : Math.max(0, Number(it.count)),
+            status: it.status,
+          })),
+      };
+    });
+    await saveDiningMenu(String(hallId), today, cleaned, String(moderatorName));
+    await logUpdate(String(hallId), String(moderatorName), 'dining', 'Updated dining menu');
+    router.replace({
+      pathname: '/SuccessScreen',
+      params: { hallId, hallName, role, moderatorName },
+    });
+  } catch (e) {
+    Alert.alert('Error', 'Could not save menu. Try again.');
+  } finally {
+    setSaving(false);
+  }
+}
 
   if (loading) {
     return (
