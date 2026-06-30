@@ -1,7 +1,7 @@
 import React from 'react';
 import {
   View, Text, StyleSheet, TouchableOpacity,
-   ScrollView, Alert,
+  ScrollView, Alert, Pressable,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useRouter, useLocalSearchParams } from 'expo-router';
@@ -17,7 +17,7 @@ export default function ModeratorDashboardScreen() {
   const accentColor = isDining ? '#2d6a4f' : '#7e57c2';
 
   const DINING_ITEMS = [
-    { label: 'Quick Status (Item-wise)', desc: 'Quickly update food availability status', icon: '⚡', route: '/QuickStatus', primary: true },
+    { label: 'Quick Status (Item-wise)', desc: 'Quickly update food availability status', icon: '⚡', route: '/QuickStatus' },
     { label: 'Update Dining Menu', desc: "Add or edit today's full dining menu", icon: '🍽️', route: '/MenuEditor' },
     { label: 'Available Food Menu', desc: 'Live view — tap "Serve" to reduce count', icon: '🥘', route: '/AvailableFood' },
     { label: 'Post Notice', desc: 'Announce delays, changes or updates', icon: '📢', route: '/NoticeEditor' },
@@ -27,7 +27,7 @@ export default function ModeratorDashboardScreen() {
   ];
 
   const CANTEEN_ITEMS = [
-    { label: 'Quick Canteen Status', desc: 'Quickly update canteen item availability', icon: '⚡', route: '/CanteenQuickStatus', primary: true },
+    { label: 'Quick Canteen Status', desc: 'Quickly update canteen item availability', icon: '⚡', route: '/CanteenQuickStatus' },
     { label: 'Update Canteen Menu', desc: "Add or edit today's canteen items", icon: '🛒', route: '/CanteenMenuEditor' },
     { label: 'Available Food Menu', desc: 'Live view — tap "Serve" to reduce count', icon: '🥘', route: '/AvailableFood' },
     { label: 'Post Notice', desc: 'Announce delays, changes or updates', icon: '📢', route: '/NoticeEditor' },
@@ -79,11 +79,17 @@ export default function ModeratorDashboardScreen() {
         </View>
 
         {MENU_ITEMS.map((item, idx) => (
-          <TouchableOpacity
+          <Pressable
             key={idx}
-            style={[styles.menuCard, item.primary && { backgroundColor: accentColor, borderColor: accentColor }]}
+            style={({ pressed }) => [
+              styles.menuCard,
+              item.primary && { backgroundColor: accentColor, borderColor: accentColor },
+              pressed && {
+                backgroundColor: accentColor + '18',
+                borderColor: accentColor,
+              },
+            ]}
             onPress={() => navigate(item.route)}
-            activeOpacity={0.88}
           >
             <View style={[styles.iconBox, item.primary && { backgroundColor: 'rgba(255,255,255,0.2)' }]}>
               <Text style={styles.menuIcon}>{item.icon}</Text>
@@ -93,7 +99,7 @@ export default function ModeratorDashboardScreen() {
               <Text style={[styles.menuDesc, item.primary && { color: 'rgba(255,255,255,0.8)' }]}>{item.desc}</Text>
             </View>
             <Text style={[styles.menuArrow, item.primary && { color: 'rgba(255,255,255,0.6)' }]}>›</Text>
-          </TouchableOpacity>
+          </Pressable>
         ))}
 
         <TouchableOpacity style={styles.homeBtn} onPress={() => router.replace('/Home')}>
@@ -131,6 +137,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row', alignItems: 'center', borderWidth: 1, borderColor: '#e8e0d5',
     shadowColor: '#000', shadowOffset: { width: 0, height: 1 },
     shadowOpacity: 0.06, shadowRadius: 4, elevation: 2,
+    overflow: 'hidden',
   },
   iconBox: {
     width: 44, height: 44, borderRadius: 12, backgroundColor: '#f0ede8',

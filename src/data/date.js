@@ -28,3 +28,8 @@ export function formatTime(isoString) {
     timeZone: 'Asia/Dhaka',
   });
 }
+export function getYesterdayKey() {
+  const d = new Date();
+  d.setDate(d.getDate() - 1);
+  return d.toLocaleDateString('en-CA', { timeZone: 'Asia/Dhaka' });
+}

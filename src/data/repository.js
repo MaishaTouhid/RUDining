@@ -4,6 +4,7 @@ import {
   onSnapshot, serverTimestamp, limit, 
 } from 'firebase/firestore';
 import { db } from '../config/firebase';
+import { getYesterdayKey } from '../data/date';
 
 
 // ─── MENU ───────────────────────────────────────────
@@ -66,10 +67,11 @@ export async function quickUpdateCanteen(hallId, dateKey, items) {
   await upsertMenu(hallId, dateKey, { canteen: { items } });
 }
 
-export async function duplicateYesterday(hallId, dateKey, type) {
-  const yesterday = new Date();
-  yesterday.setDate(yesterday.getDate() - 1);
-  const yKey = yesterday.toISOString().split('T')[0];
+{ /* export async function duplicateYesterday(hallId, dateKey, type) {
+ // const yesterday = new Date();
+  //yesterday.setDate(yesterday.getDate() - 1);
+  //const yKey = yesterday.toISOString().split('T')[0];
+   const yKey = getYesterdayKey();  //new function to get yesterday's date key
   const yMenu = await getMenu(hallId, yKey);
   if (!yMenu) return false;
   if (type === 'dining' && yMenu.dining) {
@@ -80,6 +82,43 @@ export async function duplicateYesterday(hallId, dateKey, type) {
     await upsertMenu(hallId, dateKey, { canteen: yMenu.canteen });
     return true;
   }
+  return false;
+} */}
+ function resetItemsForDuplicate(items) {
+  if (!Array.isArray(items)) return [];
+  return items.map(it => ({
+    name: it.name,
+    price: it.price,
+    count: null,
+    status: 'available',
+  }));
+}
+
+export async function duplicateYesterday(hallId, dateKey, type) {
+  const yKey = getYesterdayKey();  // Asia/Dhaka timezone অনুযায়ী yesterday
+  const yMenu = await getMenu(hallId, yKey);
+  if (!yMenu) return false;
+
+  if (type === 'dining' && yMenu.dining) {
+    const resetDining = {};
+    ['breakfast', 'lunch', 'dinner'].forEach(meal => {
+      const mealData = yMenu.dining[meal];
+      resetDining[meal] = {
+        items: resetItemsForDuplicate(mealData?.items),
+        time: mealData?.time || '',
+        note: mealData?.note || '',
+      };
+    });
+    await upsertMenu(hallId, dateKey, { dining: resetDining });
+    return true;
+  }
+
+  if (type === 'canteen' && yMenu.canteen) {
+    const resetCanteenItems = resetItemsForDuplicate(yMenu.canteen.items);
+    await upsertMenu(hallId, dateKey, { canteen: { items: resetCanteenItems } });
+    return true;
+  }
+
   return false;
 }
 
@@ -215,4 +254,55 @@ export async function getUpdateHistory(hallId) {
   } catch (e) {
     return [];
   }
+}
+// ─── GLOBAL FOOD SEARCH ─────────────────────────────
+
+export async function fetchAllHallsMenu(hallsList, dateKey) {
+  const allData = await Promise.all(
+    hallsList.map(async (hall) => {
+      const menu = await getMenu(hall.id, dateKey);
+      if (!menu) return null;
+
+      const items = [];
+
+      if (menu.dining) {
+        ['breakfast', 'lunch', 'dinner'].forEach(mealType => {
+          const mealItems = menu.dining[mealType]?.items || [];
+          mealItems.forEach(item => {
+            if (item.name) {
+              items.push({
+                hallId: hall.id,
+                hallName: hall.name,
+                itemName: item.name,
+                price: item.price,
+                count: item.count,
+                status: item.status,
+                mealType,
+              });
+            }
+          });
+        });
+      }
+
+      if (menu.canteen?.items) {
+        menu.canteen.items.forEach(item => {
+          if (item.name) {
+            items.push({
+              hallId: hall.id,
+              hallName: hall.name,
+              itemName: item.name,
+              price: item.price,
+              count: item.count,
+              status: item.status,
+              mealType: 'canteen',
+            });
+          }
+        });
+      }
+
+      return items;
+    })
+  );
+
+  return allData.filter(Boolean).flat();
 }

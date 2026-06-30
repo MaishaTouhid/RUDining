@@ -1,18 +1,22 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect } from "react";
 import {
-  View, Text, StyleSheet, TouchableOpacity,
-  FlatList, TextInput,
-} from 'react-native';
-import { SafeAreaView } from 'react-native-safe-area-context';
-import { useRouter } from 'expo-router';
-import { HALLS } from '../data/halls';
-import { getTodayKey } from '../data/date';
-import { getMenu } from '../data/repository';
+  View,
+  Text,
+  StyleSheet,
+  TouchableOpacity,
+  FlatList,
+  TextInput,
+} from "react-native";
+import { SafeAreaView } from "react-native-safe-area-context";
+import { useRouter } from "expo-router";
+import { HALLS } from "../data/halls";
+import { getTodayKey } from "../data/date";
+import { getMenu } from "../data/repository";
 
 export default function HallListScreen() {
   const router = useRouter();
-  const [filter, setFilter] = useState('all');
-  const [search, setSearch] = useState('');
+  const [filter, setFilter] = useState("all");
+  const [search, setSearch] = useState("");
   const [updatedHalls, setUpdatedHalls] = useState(new Set());
   const today = getTodayKey();
 
@@ -22,27 +26,27 @@ export default function HallListScreen() {
 
   async function checkUpdatedHalls() {
     const checks = await Promise.all(
-      HALLS.map(async h => {
+      HALLS.map(async (h) => {
         const menu = await getMenu(h.id, today);
         return menu ? h.id : null;
-      })
+      }),
     );
     setUpdatedHalls(new Set(checks.filter(Boolean)));
   }
 
-  const filtered = HALLS.filter(h => {
-    const matchType = filter === 'all' || h.type === filter;
+  const filtered = HALLS.filter((h) => {
+    const matchType = filter === "all" || h.type === filter;
     const matchSearch = h.name.toLowerCase().includes(search.toLowerCase());
     return matchType && matchSearch;
   });
 
   return (
     <SafeAreaView style={styles.container}>
-
       <View style={styles.subHeader}>
         <Text style={styles.subTitle}>Hall List</Text>
         <Text style={styles.subDesc}>
-          Search halls, filter by type, and check whether todays menu has been updated.
+          Search halls, filter by type, and check whether todays menu has been
+          updated.
         </Text>
       </View>
 
@@ -57,14 +61,19 @@ export default function HallListScreen() {
       </View>
 
       <View style={styles.filterRow}>
-        {['all', 'boys', 'girls'].map(f => (
+        {["all", "boys", "girls"].map((f) => (
           <TouchableOpacity
             key={f}
             style={[styles.filterBtn, filter === f && styles.filterActive]}
             onPress={() => setFilter(f)}
           >
-            <Text style={[styles.filterText, filter === f && styles.filterTextActive]}>
-              {f === 'all' ? 'All' : f === 'boys' ? 'Boys' : 'Girls'}
+            <Text
+              style={[
+                styles.filterText,
+                filter === f && styles.filterTextActive,
+              ]}
+            >
+              {f === "all" ? "All" : f === "boys" ? "Male" : "Female"}
             </Text>
           </TouchableOpacity>
         ))}
@@ -74,7 +83,7 @@ export default function HallListScreen() {
       <View style={styles.quickLinks}>
         <TouchableOpacity
           style={styles.quickCard}
-          onPress={() => router.push('/Feast')}
+          onPress={() => router.push("/Feast")}
         >
           <Text style={styles.quickIcon}>🎉</Text>
           <Text style={styles.quickTitle}>Feast</Text>
@@ -83,11 +92,24 @@ export default function HallListScreen() {
 
         <TouchableOpacity
           style={styles.quickCard}
-          onPress={() => router.push('/Notices')}
+          onPress={() => router.push("/Notices")}
         >
           <Text style={styles.quickIcon}>📢</Text>
           <Text style={styles.quickTitle}>Notice</Text>
-          <Text style={styles.quickDesc}>View important hall dining updates</Text>
+          <Text style={styles.quickDesc}>
+            View important hall dining updates
+          </Text>
+        </TouchableOpacity>
+      </View>
+      {/* Quick search link */}
+      <View style={styles.quickLinks}>
+        <TouchableOpacity
+          style={[styles.quickCard, { flex: 1 }]}
+          onPress={() => router.push('/FoodSearch')}
+        >
+          <Text style={styles.quickIcon}>🔍</Text>
+          <Text style={styles.quickTitle}>Search Food</Text>
+          <Text style={styles.quickDesc}>Find any food item across all 17 halls today</Text>
         </TouchableOpacity>
       </View>
 
@@ -95,17 +117,19 @@ export default function HallListScreen() {
 
       <FlatList
         data={filtered}
-        keyExtractor={item => item.id}
+        keyExtractor={(item) => item.id}
         contentContainerStyle={{ paddingHorizontal: 16, paddingBottom: 30 }}
         renderItem={({ item }) => {
           const isUpdated = updatedHalls.has(item.id);
           return (
             <TouchableOpacity
               style={styles.hallCard}
-              onPress={() => router.push({
-                pathname: '/HallDetail',
-                params: { hallId: item.id, hallName: item.name }
-              })}
+              onPress={() =>
+                router.push({
+                  pathname: "/HallDetail",
+                  params: { hallId: item.id, hallName: item.name },
+                })
+              }
             >
               <View style={styles.hallLeft}>
                 <Text style={styles.hallName}>{item.name}</Text>
@@ -116,15 +140,23 @@ export default function HallListScreen() {
               </View>
 
               <View style={styles.hallRight}>
-                <View style={[
-                  styles.typeBadge,
-                  item.type === 'girls' ? styles.typeBadgeGirls : styles.typeBadgeBoys
-                ]}>
-                  <Text style={[
-                    styles.typeText,
-                    item.type === 'girls' ? styles.typeTextGirls : styles.typeTextBoys
-                  ]}>
-                    {item.type === 'girls' ? 'GIRLS' : 'BOYS'}
+                <View
+                  style={[
+                    styles.typeBadge,
+                    item.type === "girls"
+                      ? styles.typeBadgeGirls
+                      : styles.typeBadgeBoys,
+                  ]}
+                >
+                  <Text
+                    style={[
+                      styles.typeText,
+                      item.type === "girls"
+                        ? styles.typeTextGirls
+                        : styles.typeTextBoys,
+                    ]}
+                  >
+                    {item.type === "girls" ? "FEMALE" : "MALE"}
                   </Text>
                 </View>
 
@@ -143,69 +175,111 @@ export default function HallListScreen() {
 }
 
 const styles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: '#edeae3' },
+  container: { flex: 1, backgroundColor: "#edeae3" },
   subHeader: {
-    paddingHorizontal: 16, paddingTop: 16, paddingBottom: 12,
+    paddingHorizontal: 16,
+    paddingTop: 16,
+    paddingBottom: 12,
   },
-  subTitle: { fontSize: 22, fontWeight: '800', color: '#1a1a1a', marginBottom: 4 },
-  subDesc: { fontSize: 13, color: '#6b6b60', lineHeight: 18 },
+  subTitle: {
+    fontSize: 22,
+    fontWeight: "800",
+    color: "#1a1a1a",
+    marginBottom: 4,
+  },
+  subDesc: { fontSize: 13, color: "#6b6b60", lineHeight: 18 },
   searchBox: { marginHorizontal: 16, marginBottom: 10 },
   searchInput: {
-    backgroundColor: '#f5f2eb', borderRadius: 12,
-    padding: 12, fontSize: 14, color: '#1a1a1a',
-    borderWidth: 1, borderColor: '#d8d4c8',
+    backgroundColor: "#f5f2eb",
+    borderRadius: 12,
+    padding: 12,
+    fontSize: 14,
+    color: "#1a1a1a",
+    borderWidth: 1,
+    borderColor: "#d8d4c8",
   },
   filterRow: {
-    flexDirection: 'row', paddingHorizontal: 16,
-    gap: 8, marginBottom: 14,
+    flexDirection: "row",
+    paddingHorizontal: 16,
+    gap: 8,
+    marginBottom: 14,
   },
   filterBtn: {
-    paddingHorizontal: 16, paddingVertical: 7,
-    borderRadius: 20, backgroundColor: '#f5f2eb',
-    borderWidth: 1, borderColor: '#d8d4c8',
+    paddingHorizontal: 16,
+    paddingVertical: 7,
+    borderRadius: 20,
+    backgroundColor: "#f5f2eb",
+    borderWidth: 1,
+    borderColor: "#d8d4c8",
   },
-  filterActive: { backgroundColor: '#2d5a3d', borderColor: '#2d5a3d' },
-  filterText: { fontSize: 13, fontWeight: '600', color: '#6b6b60' },
-  filterTextActive: { color: '#fff' },
+  filterActive: { backgroundColor: "#2d5a3d", borderColor: "#2d5a3d" },
+  filterText: { fontSize: 13, fontWeight: "600", color: "#6b6b60" },
+  filterTextActive: { color: "#fff" },
   quickLinks: {
-    flexDirection: 'row', paddingHorizontal: 16,
-    gap: 10, marginBottom: 16,
+    flexDirection: "row",
+    paddingHorizontal: 16,
+    gap: 10,
+    marginBottom: 16,
   },
   quickCard: {
-    flex: 1, backgroundColor: '#f5f2eb',
-    borderRadius: 14, padding: 14,
-    borderWidth: 1, borderColor: '#d8d4c8',
+    flex: 1,
+    backgroundColor: "#f5f2eb",
+    borderRadius: 14,
+    padding: 14,
+    borderWidth: 1,
+    borderColor: "#d8d4c8",
   },
   quickIcon: { fontSize: 20, marginBottom: 6 },
-  quickTitle: { fontSize: 14, fontWeight: '800', color: '#1a1a1a', marginBottom: 2 },
-  quickDesc: { fontSize: 11, color: '#7a7a6e', lineHeight: 15 },
+  quickTitle: {
+    fontSize: 14,
+    fontWeight: "800",
+    color: "#1a1a1a",
+    marginBottom: 2,
+  },
+  quickDesc: { fontSize: 11, color: "#7a7a6e", lineHeight: 15 },
   listTitle: {
-    fontSize: 14, fontWeight: '800', color: '#1a1a1a',
-    paddingHorizontal: 16, marginBottom: 10,
+    fontSize: 14,
+    fontWeight: "800",
+    color: "#1a1a1a",
+    paddingHorizontal: 16,
+    marginBottom: 10,
   },
   hallCard: {
-    backgroundColor: '#f5f2eb', borderRadius: 14,
-    padding: 14, marginBottom: 10,
-    flexDirection: 'row', alignItems: 'flex-start',
-    borderWidth: 1, borderColor: '#d8d4c8',
-    shadowColor: '#000', shadowOffset: { width: 0, height: 1 },
-    shadowOpacity: 0.04, shadowRadius: 4, elevation: 1,
+    backgroundColor: "#f5f2eb",
+    borderRadius: 14,
+    padding: 14,
+    marginBottom: 10,
+    flexDirection: "row",
+    alignItems: "flex-start",
+    borderWidth: 1,
+    borderColor: "#d8d4c8",
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 1 },
+    shadowOpacity: 0.04,
+    shadowRadius: 4,
+    elevation: 1,
   },
   hallLeft: { flex: 1 },
-  hallName: { fontSize: 15, fontWeight: '800', color: '#1a1a1a', marginBottom: 4 },
-  hallDesc: { fontSize: 12, color: '#6b6b60', marginBottom: 6, lineHeight: 16 },
-  hallMeals: { fontSize: 11, color: '#7a7a6e' },
-  hallRight: { alignItems: 'flex-end', gap: 6 },
-  typeBadge: { paddingHorizontal: 8, paddingVertical: 3, borderRadius: 6 },
-  typeBadgeBoys: { backgroundColor: '#e8ede9' },
-  typeBadgeGirls: { backgroundColor: '#f0ede6' },
-  typeText: { fontSize: 10, fontWeight: '800' },
-  typeTextBoys: { color: '#2d5a3d' },
-  typeTextGirls: { color: '#8b6a4f' },
-  updatedBadge: {
-    backgroundColor: '#d4e6d8',
-    borderRadius: 6,
-    paddingHorizontal: 8, paddingVertical: 3,
+  hallName: {
+    fontSize: 15,
+    fontWeight: "800",
+    color: "#1a1a1a",
+    marginBottom: 4,
   },
-  updatedText: { fontSize: 10, fontWeight: '700', color: '#2d5a3d' },
+  hallDesc: { fontSize: 12, color: "#6b6b60", marginBottom: 6, lineHeight: 16 },
+  hallMeals: { fontSize: 11, color: "#7a7a6e" },
+  hallRight: { alignItems: "flex-end", gap: 6 },
+  typeBadge: { paddingHorizontal: 8, paddingVertical: 3, borderRadius: 6 },
+  typeBadgeBoys: { backgroundColor: "#e8ede9" },
+  typeBadgeGirls: { backgroundColor: "#f0ede6" },
+  typeText: { fontSize: 10, fontWeight: "800" },
+  typeTextBoys: { color: "#2d5a3d" },
+  typeTextGirls: { color: "#8b6a4f" },
+  updatedBadge: {
+    backgroundColor: "#d4e6d8",
+    borderRadius: 6,
+    paddingHorizontal: 8,
+    paddingVertical: 3,
+  },
+  updatedText: { fontSize: 10, fontWeight: "700", color: "#2d5a3d" },
 });

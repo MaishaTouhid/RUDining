@@ -31,9 +31,9 @@ export default function SuccessScreen() {
           <Text style={styles.dashBtnText}>Back to Dashboard</Text>
         </TouchableOpacity>
 
-        <TouchableOpacity style={styles.editBtn} onPress={() => router.back()}>
+        {/*<TouchableOpacity style={styles.editBtn} onPress={() => router.back()}>
           <Text style={styles.editBtnText}>Edit Again</Text>
-        </TouchableOpacity>
+        </TouchableOpacity> */}
       </View>
     </SafeAreaView>
   );

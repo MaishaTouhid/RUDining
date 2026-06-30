@@ -21,6 +21,7 @@ export default function RootLayout() {
       <Stack.Screen name="HallDetail" options={{ title: "Today's Menu" }} />
       <Stack.Screen name="Feast" options={{ title: 'Feast' }} />
       <Stack.Screen name="Notices" options={{ title: 'Notices' }} />
+      <Stack.Screen name="FoodSearch" options={{ title: 'Search Food' }} />
       <Stack.Screen name="ModeratorRole" options={{ title: 'Moderator' }} />
       <Stack.Screen name="ModeratorLogin" options={{ title: 'Moderator Login' }} />
       <Stack.Screen name="ModeratorDashboard" options={{ title: 'Dashboard' }} />

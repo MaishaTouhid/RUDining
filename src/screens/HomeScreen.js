@@ -33,7 +33,7 @@ export default function HomeScreen() {
           onPress={() => router.push('/HallList')}
         >
           <View style={styles.roleIcon}>
-            <Text style={styles.roleIconText}>🎓</Text>
+            <Text style={styles.roleIconText}>𓂃✍︎📚</Text>
           </View>
           <View style={styles.roleInfo}>
             <Text style={styles.roleName}>Student</Text>

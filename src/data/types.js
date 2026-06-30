@@ -19,3 +19,5 @@ export const MODERATOR_ROLES = {
   DINING:  'dining',
   CANTEEN: 'canteen',
 };
+
+ 
