@@ -5,7 +5,7 @@ import {
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useLocalSearchParams, useRouter } from 'expo-router';
-import { getMenu } from '../data/repository';
+import { subscribeMenu } from '../data/repository';
 import { getTodayKey, formatTime } from '../data/date';
 import { STATUS_CONFIG } from '../data/types';
 
@@ -29,18 +29,40 @@ export default function HallDetailsScreen() {
 
   const [menu, setMenu] = useState(null);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+  const [retryKey, setRetryKey] = useState(0);
   const [expanded, setExpanded] = useState(null);
   const [activeMeal, setActiveMeal] = useState('breakfast');
 
+  // ─── Real-time menu listener ───────────────────────────
+  // subscribeMenu() Firebase এর সাথে live connection খোলে (onSnapshot)।
+  // Moderator menu update করলে এই callback automatically fire হয়
+  // এবং state নতুন data দিয়ে update হয় — student কে manual refresh করতে হয় না।
+  // দ্বিতীয় (error) callback দিয়ে internet/permission সমস্যা handle করা হয়।
   useEffect(() => {
-    fetchMenu();
-  }, []);
-
-  async function fetchMenu() {
     setLoading(true);
-    const data = await getMenu(String(hallId), today);
-    setMenu(data);
-    setLoading(false);
+    setError(null);
+
+    const unsub = subscribeMenu(
+      String(hallId),
+      today,
+      (data) => {
+        setMenu(data);
+        setLoading(false);
+        setError(null);
+      },
+      (err) => {
+        setLoading(false);
+        setError('Failed to load the menu. Check your internet connection and try again.');
+      }
+    );
+
+    // CRITICAL: cleanup — screen বন্ধ হলে listener বন্ধ করো, নাহলে memory leak হবে
+    return () => unsub();
+  }, [hallId, retryKey]);
+
+  function handleRetry() {
+    setRetryKey(prev => prev + 1);
   }
 
   function toggleExpand(key) {
@@ -248,9 +270,19 @@ export default function HallDetailsScreen() {
 
       </ScrollView>
 
-      {loading && (
+      {loading && !error && (
         <View style={styles.loadingOverlay}>
           <ActivityIndicator size="large" color="#2d5a3d" />
+        </View>
+      )}
+
+      {error && (
+        <View style={styles.errorOverlay}>
+          <Text style={styles.errorIcon}>📡</Text>
+          <Text style={styles.errorText}>{error}</Text>
+          <TouchableOpacity style={styles.retryBtn} onPress={handleRetry}>
+            <Text style={styles.retryBtnText}>আবার চেষ্টা করুন</Text>
+          </TouchableOpacity>
         </View>
       )}
     </SafeAreaView>
@@ -416,5 +448,35 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
     backgroundColor: 'rgba(237,234,227,0.7)',
+  },
+
+  errorOverlay: {
+    ...StyleSheet.absoluteFillObject,
+    alignItems: 'center',
+    justifyContent: 'center',
+    backgroundColor: '#edeae3',
+    padding: 32,
+  },
+  errorIcon: {
+    fontSize: 40,
+    marginBottom: 12,
+  },
+  errorText: {
+    fontSize: 14,
+    color: '#6b6b60',
+    textAlign: 'center',
+    marginBottom: 20,
+    lineHeight: 20,
+  },
+  retryBtn: {
+    backgroundColor: '#2d5a3d',
+    borderRadius: 12,
+    paddingHorizontal: 24,
+    paddingVertical: 12,
+  },
+  retryBtnText: {
+    color: '#fff',
+    fontWeight: '700',
+    fontSize: 14,
   },
 });

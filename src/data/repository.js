@@ -21,11 +21,25 @@ export async function getMenu(hallId, dateKey) {
 }
 
 // Real-time listener for student view
-export function subscribeMenu(hallId, dateKey, callback) {
+/* export function subscribeMenu(hallId, dateKey, callback) {
   const ref = doc(db, 'menus', `${hallId}_${dateKey}`);
   return onSnapshot(ref, (snap) => {
     callback(snap.exists() ? snap.data() : null);
-  });
+  }); 
+} */
+// Real-time listener for student view
+export function subscribeMenu(hallId, dateKey, callback, onError) {
+  const ref = doc(db, 'menus', `${hallId}_${dateKey}`);
+  return onSnapshot(
+    ref,
+    (snap) => {
+      callback(snap.exists() ? snap.data() : null);
+    },
+    (error) => {
+      console.error('subscribeMenu error:', error);
+      if (onError) onError(error);
+    }
+  );
 }
 
 export async function upsertMenu(hallId, dateKey, payload) {
