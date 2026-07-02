@@ -149,7 +149,7 @@ const styles = StyleSheet.create({
     width,
     paddingHorizontal: 32,
     paddingTop: 20,
-    alignItems: 'center',
+    alignItems: 'center',  
   },
   iconArea: {
     width: '100%',
