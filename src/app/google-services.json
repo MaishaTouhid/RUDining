@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "984352980373",
+    "project_id": "ru-dine",
+    "storage_bucket": "ru-dine.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:984352980373:android:2b67aed1dc04b64d5eca9c",
+        "android_client_info": {
+          "package_name": "com.maishatouhid.RUDining"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDCobJzh72dDu9GxDPSHOmCL4nH1M9vKz4"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

@@ -9,7 +9,13 @@
       "distribution": "internal"
     },
     "preview": {
-      "distribution": "internal"
+      "distribution": "internal",
+      "android": {
+        "buildType": "apk",
+        "env": {
+          "GOOGLE_SERVICES_JSON": "android/app/google-services.json"
+        }
+      }
     },
     "production": {
       "autoIncrement": true
