@@ -158,5 +158,3 @@ const styles = StyleSheet.create({
 });
 
 
-{ /* label: 'Verification', desc: 'View update history and verify records', icon: '✅', route: '/Verification'  */}
-{ /* label: 'Verification', desc: 'View update history and verify records', icon: '✅', route: '/Verification'  */}
