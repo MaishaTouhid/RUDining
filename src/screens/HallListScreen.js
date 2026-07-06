@@ -4,7 +4,7 @@ import {
   Text,
   StyleSheet,
   TouchableOpacity,
-  FlatList,
+  ScrollView,
   TextInput,
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
@@ -42,140 +42,144 @@ export default function HallListScreen() {
 
   return (
     <SafeAreaView style={styles.container}>
-      <View style={styles.subHeader}>
-        <Text style={styles.subTitle}>Hall List</Text>
-        <Text style={styles.subDesc}>
-          Search halls, filter by type, and check whether todays menu has been
-          updated.
-        </Text>
-      </View>
+      <ScrollView
+        contentContainerStyle={styles.scrollContent}
+        showsVerticalScrollIndicator={false}
+      >
+        <View style={styles.subHeader}>
+          <Text style={styles.subTitle}>Hall List</Text>
+          <Text style={styles.subDesc}>
+            Search halls, filter by type, and check whether todays menu has been
+            updated.
+          </Text>
+        </View>
 
-      <View style={styles.searchBox}>
-        <TextInput
-          style={styles.searchInput}
-          placeholder="Search hall name"
-          placeholderTextColor="#9a9a8e"
-          value={search}
-          onChangeText={setSearch}
-        />
-      </View>
+        <View style={styles.searchBox}>
+          <TextInput
+            style={styles.searchInput}
+            placeholder="Search hall name"
+            placeholderTextColor="#9a9a8e"
+            value={search}
+            onChangeText={setSearch}
+          />
+        </View>
 
-      <View style={styles.filterRow}>
-        {["all", "boys", "girls"].map((f) => (
-          <TouchableOpacity
-            key={f}
-            style={[styles.filterBtn, filter === f && styles.filterActive]}
-            onPress={() => setFilter(f)}
-          >
-            <Text
-              style={[
-                styles.filterText,
-                filter === f && styles.filterTextActive,
-              ]}
+        <View style={styles.filterRow}>
+          {["all", "boys", "girls"].map((f) => (
+            <TouchableOpacity
+              key={f}
+              style={[styles.filterBtn, filter === f && styles.filterActive]}
+              onPress={() => setFilter(f)}
             >
-              {f === "all" ? "All" : f === "boys" ? "Male" : "Female"}
+              <Text
+                style={[
+                  styles.filterText,
+                  filter === f && styles.filterTextActive,
+                ]}
+              >
+                {f === "all" ? "All" : f === "boys" ? "Male" : "Female"}
+              </Text>
+            </TouchableOpacity>
+          ))}
+        </View>
+
+        {/* Quick links */}
+        <View style={styles.quickLinks}>
+          <TouchableOpacity
+            style={styles.quickCard}
+            onPress={() => router.push("/Feast")}
+          >
+            <Text style={styles.quickIcon}>🎉✨</Text>
+            <Text style={styles.quickTitle}>Feast</Text>
+            <Text style={styles.quickDesc}>See feast date, menu, and price</Text>
+          </TouchableOpacity>
+
+          <TouchableOpacity
+            style={styles.quickCard}
+            onPress={() => router.push("/Notices")}
+          >
+            <Text style={styles.quickIcon}>🗣📢</Text>
+            <Text style={styles.quickTitle}>Notice</Text>
+            <Text style={styles.quickDesc}>
+              View important hall dining updates
             </Text>
           </TouchableOpacity>
-        ))}
-      </View>
+        </View>
+        {/* Quick search link */}
+        <View style={styles.quickLinks}>
+          <TouchableOpacity
+            style={[styles.quickCard, { flex: 1 }]}
+            onPress={() => router.push('/FoodSearch')}
+          >
+            <Text style={styles.quickIcon}>🔍</Text>
+            <Text style={styles.quickTitle}>Search Food</Text>
+            <Text style={styles.quickDesc}>Find any food item across all 17 halls today</Text>
+          </TouchableOpacity>
+        </View>
 
-      {/* Quick links */}
-      <View style={styles.quickLinks}>
-        <TouchableOpacity
-          style={styles.quickCard}
-          onPress={() => router.push("/Feast")}
-        >
-          <Text style={styles.quickIcon}>🎉✨</Text>
-          <Text style={styles.quickTitle}>Feast</Text>
-          <Text style={styles.quickDesc}>See feast date, menu, and price</Text>
-        </TouchableOpacity>
+        <Text style={styles.listTitle}>Available Halls</Text>
 
-        <TouchableOpacity
-          style={styles.quickCard}
-          onPress={() => router.push("/Notices")}
-        >
-          <Text style={styles.quickIcon}>🗣📢</Text>
-          <Text style={styles.quickTitle}>Notice</Text>
-          <Text style={styles.quickDesc}>
-            View important hall dining updates
-          </Text>
-        </TouchableOpacity>
-      </View>
-      {/* Quick search link */}
-      <View style={styles.quickLinks}>
-        <TouchableOpacity
-          style={[styles.quickCard, { flex: 1 }]}
-          onPress={() => router.push('/FoodSearch')}
-        >
-          <Text style={styles.quickIcon}>🔍</Text>
-          <Text style={styles.quickTitle}>Search Food</Text>
-          <Text style={styles.quickDesc}>Find any food item across all 17 halls today</Text>
-        </TouchableOpacity>
-      </View>
-
-      <Text style={styles.listTitle}>Available Halls</Text>
-
-      <FlatList
-        data={filtered}
-        keyExtractor={(item) => item.id}
-        contentContainerStyle={{ paddingHorizontal: 16, paddingBottom: 30 }}
-        renderItem={({ item }) => {
-          const isUpdated = updatedHalls.has(item.id);
-          return (
-            <TouchableOpacity
-              style={styles.hallCard}
-              onPress={() =>
-                router.push({
-                  pathname: "/HallDetail",
-                  params: { hallId: item.id, hallName: item.name },
-                })
-              }
-            >
-              <View style={styles.hallLeft}>
-                <Text style={styles.hallName}>{item.name}</Text>
-                <Text style={styles.hallDesc}>
-                  Tap to view todays dining and canteen menu
-                </Text>
-                <Text style={styles.hallMeals}>Breakfast • Lunch • Dinner</Text>
-              </View>
-
-              <View style={styles.hallRight}>
-                <View
-                  style={[
-                    styles.typeBadge,
-                    item.type === "girls"
-                      ? styles.typeBadgeGirls
-                      : styles.typeBadgeBoys,
-                  ]}
-                >
-                  <Text
-                    style={[
-                      styles.typeText,
-                      item.type === "girls"
-                        ? styles.typeTextGirls
-                        : styles.typeTextBoys,
-                    ]}
-                  >
-                    {item.type === "girls" ? "FEMALE" : "MALE"}
+        <View style={styles.hallListWrap}>
+          {filtered.map((item) => {
+            const isUpdated = updatedHalls.has(item.id);
+            return (
+              <TouchableOpacity
+                key={item.id}
+                style={styles.hallCard}
+                onPress={() =>
+                  router.push({
+                    pathname: "/HallDetail",
+                    params: { hallId: item.id, hallName: item.name },
+                  })
+                }
+              >
+                <View style={styles.hallLeft}>
+                  <Text style={styles.hallName}>{item.name}</Text>
+                  <Text style={styles.hallDesc}>
+                    Tap to view todays dining and canteen menu
                   </Text>
+                  <Text style={styles.hallMeals}>Breakfast • Lunch • Dinner</Text>
                 </View>
 
-                {isUpdated && (
-                  <View style={styles.updatedBadge}>
-                    <Text style={styles.updatedText}>Updated today</Text>
+                <View style={styles.hallRight}>
+                  <View
+                    style={[
+                      styles.typeBadge,
+                      item.type === "girls"
+                        ? styles.typeBadgeGirls
+                        : styles.typeBadgeBoys,
+                    ]}
+                  >
+                    <Text
+                      style={[
+                        styles.typeText,
+                        item.type === "girls"
+                          ? styles.typeTextGirls
+                          : styles.typeTextBoys,
+                      ]}
+                    >
+                      {item.type === "girls" ? "FEMALE" : "MALE"}
+                    </Text>
                   </View>
-                )}
-              </View>
-            </TouchableOpacity>
-          );
-        }}
-      />
+
+                  {isUpdated && (
+                    <View style={styles.updatedBadge}>
+                      <Text style={styles.updatedText}>Updated today</Text>
+                    </View>
+                  )}
+                </View>
+              </TouchableOpacity>
+            );
+          })}
+        </View>
+      </ScrollView>
     </SafeAreaView>
   );
 }
 
 const styles = StyleSheet.create({
   container: { flex: 1, backgroundColor: "#edeae3" },
+  scrollContent: { paddingBottom: 30 },
   subHeader: {
     paddingHorizontal: 16,
     paddingTop: 16,
@@ -244,6 +248,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: 16,
     marginBottom: 10,
   },
+  hallListWrap: { paddingHorizontal: 16 },
   hallCard: {
     backgroundColor: "#f5f2eb",
     borderRadius: 14,
