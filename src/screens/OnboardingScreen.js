@@ -56,9 +56,9 @@ export default function OnboardingScreen() {
     }
   }
 
-  function back() {
+   {/* function back() {
     if (current > 0) goTo(current - 1);
-  }
+  }  */}
 
   const renderSlide = ({ item }) => (
     <View style={styles.slide}>
@@ -109,7 +109,7 @@ export default function OnboardingScreen() {
         ))}
       </View>
 
-      {/* Buttons */}
+      {/* Buttons 
       <View style={styles.btnRow}>
         {current > 0 ? (
           <TouchableOpacity style={styles.backBtn} onPress={back}>
@@ -119,6 +119,15 @@ export default function OnboardingScreen() {
           <View style={{ flex: 1 }} />
         )}
 
+        <TouchableOpacity style={styles.nextBtn} onPress={next}>
+          <Text style={styles.nextBtnText}>
+            {current === SLIDES.length - 1 ? 'Get Started' : 'Next'}
+          </Text>
+        </TouchableOpacity>
+      </View> */}
+
+      {/* Buttons */}
+      <View style={styles.btnRow}>
         <TouchableOpacity style={styles.nextBtn} onPress={next}>
           <Text style={styles.nextBtnText}>
             {current === SLIDES.length - 1 ? 'Get Started' : 'Next'}
@@ -207,9 +216,11 @@ const styles = StyleSheet.create({
   btnRow: {
     flexDirection: 'row',
     paddingHorizontal: 32,
-    gap: 12,
+    //gap: 12,
+    justifyContent: 'center',
     marginBottom: 18,
   },
+  /*
   backBtn: {
     flex: 1,
     paddingVertical: 15,
@@ -220,8 +231,16 @@ const styles = StyleSheet.create({
   backBtnText: {
     fontSize: 15, fontWeight: '700', color: '#5a5a50',
   },
-  nextBtn: {
+   nextBtn: {
     flex: 2,
+    paddingVertical: 15,
+    borderRadius: 16,
+    backgroundColor: '#2d5a3d',
+    alignItems: 'center',
+  },*/
+  
+  nextBtn: {
+    width: '70%',
     paddingVertical: 15,
     borderRadius: 16,
     backgroundColor: '#2d5a3d',

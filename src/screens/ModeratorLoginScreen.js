@@ -100,11 +100,11 @@ export default function ModeratorLoginScreen() {
               </TouchableOpacity>
             </View>
 
-            <View style={styles.hintBox}>
+           {/* <View style={styles.hintBox}>
               <Text style={styles.hintText}>
                 💡 Format: <Text style={{ fontWeight: '700' }}>{roleLabel.toLowerCase()}.hall_id@rudining.com</Text>
               </Text>
-            </View>
+            </View> */}
 
             <TouchableOpacity
               style={[styles.loginBtn, { backgroundColor: roleColor }, loading && styles.loginBtnDisabled]}

@@ -121,7 +121,7 @@ export default function ModeratorRoleScreen() {
           disabled={!!checking}
           activeOpacity={0.88}
         >
-          <Text style={styles.roleCardIcon}>🛒</Text>
+          <Text style={styles.roleCardIcon}>🍱</Text>
           <View style={styles.roleCardInfo}>
             <Text style={styles.roleCardTitle}>Canteen Moderator</Text>
             <Text style={styles.roleCardDesc}>Manage canteen items & availability</Text>
@@ -149,7 +149,7 @@ export default function ModeratorRoleScreen() {
             {/* Header */}
             <View style={[styles.modalHeader, { backgroundColor: accentColor }]}>
               <Text style={styles.modalHeaderIcon}>
-                {pendingRole === 'dining' ? '🍽️' : '🛒'}
+                {pendingRole === 'dining' ? '🍽️' : '🍱'}
               </Text>
               <Text style={styles.modalHeaderText}>Confirm Identity</Text>
             </View>

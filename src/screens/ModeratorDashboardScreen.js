@@ -23,17 +23,17 @@ export default function ModeratorDashboardScreen() {
     { label: 'Post Notice', desc: 'Announce delays, changes or updates', icon: '📢', route: '/NoticeEditor' },
     { label: 'Add Feast', desc: 'Schedule a special feast event', icon: '🎉', route: '/FeastEditor' },
     { label: 'Daily Reset', desc: 'Duplicate yesterday or clear for today', icon: '🔄', route: '/DailyReset' },
-    { label: 'Verification', desc: 'View update history and verify records', icon: '✅', route: '/Verification' },
+
   ];
 
   const CANTEEN_ITEMS = [
     { label: 'Quick Canteen Status', desc: 'Quickly update canteen item availability', icon: '⚡', route: '/CanteenQuickStatus' },
-    { label: 'Update Canteen Menu', desc: "Add or edit today's canteen items", icon: '🛒', route: '/CanteenMenuEditor' },
+    { label: 'Update Canteen Menu', desc: "Add or edit today's canteen items", icon: '🍛', route: '/CanteenMenuEditor' },
     { label: 'Available Food Menu', desc: 'Live view — tap "Serve" to reduce count', icon: '🥘', route: '/AvailableFood' },
     { label: 'Post Notice', desc: 'Announce delays, changes or updates', icon: '📢', route: '/NoticeEditor' },
     { label: 'Add Feast', desc: 'Schedule a special canteen feast', icon: '🎉', route: '/FeastEditor' },
     { label: 'Daily Reset', desc: 'Duplicate yesterday or clear for today', icon: '🔄', route: '/DailyReset' },
-    { label: 'Verification', desc: 'View update history and verify records', icon: '✅', route: '/Verification' },
+
   ];
 
   const MENU_ITEMS = isDining ? DINING_ITEMS : CANTEEN_ITEMS;
@@ -156,3 +156,7 @@ const styles = StyleSheet.create({
   logoutLink: { alignItems: 'center', paddingVertical: 4 },
   logoutLinkText: { fontSize: 14, color: '#e53935', fontWeight: '600' },
 });
+
+
+{ /* label: 'Verification', desc: 'View update history and verify records', icon: '✅', route: '/Verification'  */}
+{ /* label: 'Verification', desc: 'View update history and verify records', icon: '✅', route: '/Verification'  */}

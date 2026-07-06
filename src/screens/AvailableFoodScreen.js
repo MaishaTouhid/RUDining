@@ -153,7 +153,7 @@ export default function AvailableFoodScreen() {
   return (
     <SafeAreaView style={styles.container}>
       <ScrollView contentContainerStyle={styles.scroll} showsVerticalScrollIndicator={false}>
-        <Text style={styles.pageTitle}>{isDining ? '🍽️' : '🛒'} Available Food Menu</Text>
+        <Text style={styles.pageTitle}>{isDining ? '🍽️' : '🍱'} Available Food Menu</Text>
         <Text style={styles.pageSub}>{hallId} • {today} • Live quantity</Text>
 
         <View style={[styles.infoBanner, { backgroundColor: isDining ? '#d8ead2' : '#ede7f6' }]}>
@@ -190,7 +190,7 @@ export default function AvailableFoodScreen() {
           <>
             {canteenItems.length === 0 ? (
               <View style={styles.emptyBox}>
-                <Text style={styles.emptyIcon}>🛒</Text>
+                <Text style={styles.emptyIcon}>🍽️</Text>
                 <Text style={styles.emptyText}>No canteen items. Add from Canteen Menu Editor.</Text>
               </View>
             ) : (

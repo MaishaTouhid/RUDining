@@ -50,7 +50,7 @@ export default function HomeScreen() {
           onPress={() => router.push('/ModeratorRole')}
         >
           <View style={[styles.roleIcon, styles.roleIconMod]}>
-            <Text style={styles.roleIconText}>🛡️</Text>
+            <Text style={styles.roleIconText}>👩🏻‍🍳</Text>
           </View>
           <View style={styles.roleInfo}>
             <Text style={styles.roleName}>Moderator</Text>

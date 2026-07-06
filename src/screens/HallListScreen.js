@@ -85,7 +85,7 @@ export default function HallListScreen() {
           style={styles.quickCard}
           onPress={() => router.push("/Feast")}
         >
-          <Text style={styles.quickIcon}>🎉</Text>
+          <Text style={styles.quickIcon}>🎉✨</Text>
           <Text style={styles.quickTitle}>Feast</Text>
           <Text style={styles.quickDesc}>See feast date, menu, and price</Text>
         </TouchableOpacity>
@@ -94,7 +94,7 @@ export default function HallListScreen() {
           style={styles.quickCard}
           onPress={() => router.push("/Notices")}
         >
-          <Text style={styles.quickIcon}>📢</Text>
+          <Text style={styles.quickIcon}>🗣📢</Text>
           <Text style={styles.quickTitle}>Notice</Text>
           <Text style={styles.quickDesc}>
             View important hall dining updates
