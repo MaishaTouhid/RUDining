@@ -1,0 +1,2322 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>HallMenu RU — Prototype</title>
+<style>
+* { box-sizing: border-box; margin: 0; padding: 0; }
+
+body {
+  font-family: -apple-system, 'Segoe UI', sans-serif;
+  background: #1a1a1a;
+  min-height: 100vh;
+  display: flex;
+  justify-content: center;
+  align-items: flex-start;
+  padding: 32px 16px;
+}
+
+/* Toast notification */
+#toast-container {
+  position: fixed;
+  bottom: 30px;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 9999;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  pointer-events: none;
+}
+.toast {
+  background: #1a1a1a;
+  color: white;
+  padding: 10px 20px;
+  border-radius: 20px;
+  font-size: 13px;
+  font-weight: 600;
+  opacity: 0;
+  transform: translateY(10px);
+  transition: opacity 0.25s, transform 0.25s;
+  white-space: nowrap;
+  box-shadow: 0 4px 20px rgba(0,0,0,0.3);
+}
+.toast.toast-success { background: #2d6a4f; }
+.toast.toast-error { background: #e53935; }
+.toast.toast-show { opacity: 1; transform: translateY(0); }
+
+/* Slide transition */
+.slide { transition: opacity 0.18s ease; }
+.slide.active { opacity: 1; }
+.slide:not(.active) { opacity: 0; }
+
+/* Average rating badge */
+.avg-rating {
+  display: inline-flex;
+  align-items: center;
+  gap: 3px;
+  background: #fff8e1;
+  color: #f57f17;
+  font-size: 11px;
+  font-weight: 700;
+  padding: 2px 8px;
+  border-radius: 8px;
+}
+
+/* Animated quantity indicator */
+@keyframes pulse-qty {
+  0% { transform: scale(1); }
+  50% { transform: scale(1.15); }
+  100% { transform: scale(1); }
+}
+.qty-pulse { animation: pulse-qty 0.35s ease; }
+
+.outer {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 16px;
+}
+
+.label {
+  color: rgba(255,255,255,0.5);
+  font-size: 13px;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+}
+
+.phone {
+  width: 375px;
+  height: 750px;
+  background: #f5f0e8;
+  border-radius: 50px;
+  border: 10px solid #111;
+  box-shadow: 0 0 0 2px #555, inset 0 0 0 1px #333, 0 32px 80px rgba(0,0,0,0.7);
+  overflow: hidden;
+  position: relative;
+  display: flex;
+  flex-direction: column;
+}
+
+.notch {
+  position: absolute;
+  top: 0; left: 50%;
+  transform: translateX(-50%);
+  width: 130px; height: 30px;
+  background: #111;
+  border-radius: 0 0 20px 20px;
+  z-index: 100;
+}
+
+.status-bar {
+  height: 44px;
+  background: #f5f0e8;
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  padding: 0 20px 6px;
+  font-size: 12px;
+  font-weight: 600;
+  color: #1a1a1a;
+  position: relative;
+  z-index: 50;
+  flex-shrink: 0;
+}
+
+.screen {
+  flex: 1;
+  overflow: hidden;
+  position: relative;
+}
+
+.slide {
+  position: absolute;
+  top: 0; left: 0; right: 0; bottom: 0;
+  background: #f5f0e8;
+  overflow-y: auto;
+  overflow-x: hidden;
+  display: none;
+  padding-bottom: 20px;
+}
+.slide.active { display: block; }
+.slide::-webkit-scrollbar { width: 0; }
+
+/* Header */
+.app-header {
+  background: #2d6a4f;
+  color: white;
+  text-align: center;
+  padding: 14px 16px;
+  font-size: 17px;
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  position: relative;
+  flex-shrink: 0;
+}
+.app-header .back-btn {
+  position: absolute; left: 14px;
+  font-size: 22px; cursor: pointer;
+  color: white; padding: 4px;
+}
+.app-header .title { flex: 1; text-align: center; font-size: 17px; }
+
+/* Splash */
+.splash {
+  display: flex; flex-direction: column;
+  align-items: center; justify-content: center;
+  height: 100%; background: #f5f0e8; padding: 40px 24px;
+}
+.splash .logo {
+  width: 88px; height: 88px; background: #52b788;
+  border-radius: 22px; display: flex; align-items: center;
+  justify-content: center; color: white; font-size: 30px; font-weight: 700;
+  margin-bottom: 18px;
+  box-shadow: 0 8px 24px rgba(92,107,192,0.35);
+}
+.splash h1 { font-size: 26px; font-weight: 700; color: #1a1a1a; margin-bottom: 6px; }
+.splash .sub { font-size: 13px; color: #888; margin-bottom: 36px; }
+.dots { display: flex; gap: 6px; margin-bottom: auto; }
+.dot { width: 8px; height: 8px; border-radius: 50%; background: #b7d5b0; }
+.dot.active { background: #2d6a4f; width: 20px; border-radius: 4px; }
+.splash-footer { font-size: 12px; color: #bbb; margin-top: auto; }
+
+/* Onboarding */
+.onboarding {
+  display: flex; flex-direction: column;
+  align-items: center; min-height: 100%;
+  background: #f5f0e8; padding: 20px 24px;
+}
+.onboarding .skip-btn {
+  align-self: flex-end; color: #888; font-size: 14px;
+  cursor: pointer; padding: 4px 8px;
+}
+.onboard-icon { font-size: 56px; margin: 40px 0 24px; }
+.onboarding h2 { font-size: 24px; font-weight: 700; color: #1a1a1a; text-align: center; margin-bottom: 12px; }
+.onboarding p { font-size: 14px; color: #666; text-align: center; line-height: 1.6; margin-bottom: 32px; }
+
+.btn-primary {
+  width: 100%; padding: 15px; background: #2d6a4f;
+  color: white; border: none; border-radius: 14px;
+  font-size: 16px; font-weight: 600; cursor: pointer;
+  margin-bottom: 10px; transition: background 0.15s;
+}
+.btn-primary:hover { background: #1b4332; }
+.btn-primary:active { transform: scale(0.98); }
+
+.btn-secondary {
+  width: 100%; padding: 14px; background: #d8ead2;
+  color: #2d6a4f; border: none; border-radius: 14px;
+  font-size: 16px; font-weight: 600; cursor: pointer;
+  margin-bottom: 10px; transition: background 0.15s;
+}
+.btn-secondary:hover { background: #c3ddc0; }
+
+.btn-outline {
+  width: 45%; padding: 14px; background: #d8ead2;
+  color: #555; border: none; border-radius: 14px;
+  font-size: 15px; font-weight: 600; cursor: pointer;
+  transition: background 0.15s;
+}
+.btn-danger {
+  width: 45%; padding: 14px; background: #fff3f3;
+  color: #e53935; border: 1.5px solid #ffcdd2; border-radius: 14px;
+  font-size: 15px; font-weight: 600; cursor: pointer;
+}
+.btn-row { display: flex; gap: 10px; width: 100%; margin-top: auto; margin-bottom: 8px; }
+.onboarding-footer { font-size: 12px; color: #bbb; margin-top: 12px; }
+.dots-row { display: flex; gap: 6px; margin: 16px 0; }
+
+/* Cards */
+.card {
+  background: white; border-radius: 14px;
+  margin: 0 16px 12px; padding: 16px;
+  box-shadow: 0 1px 4px rgba(0,0,0,0.06);
+}
+.section-title {
+  font-size: 13px; font-weight: 700; color: #888;
+  padding: 16px 16px 8px; text-transform: uppercase; letter-spacing: 0.5px;
+}
+
+/* Role select */
+.role-card {
+  background: white; border-radius: 14px;
+  margin: 0 16px 10px; padding: 16px;
+  display: flex; align-items: center; gap: 14px;
+  cursor: pointer; transition: transform 0.1s;
+  box-shadow: 0 1px 4px rgba(0,0,0,0.06);
+}
+.role-card:active { transform: scale(0.98); }
+.role-icon {
+  width: 48px; height: 48px; border-radius: 12px;
+  background: #d8ead2; display: flex; align-items: center;
+  justify-content: center; font-size: 22px; flex-shrink: 0;
+}
+.role-info h3 { font-size: 16px; font-weight: 600; color: #1a1a1a; }
+.role-info p { font-size: 12px; color: #888; line-height: 1.4; margin-top: 2px; }
+.role-arrow { margin-left: auto; color: #bbb; font-size: 20px; }
+
+/* Hall list */
+.search-bar {
+  margin: 12px 16px; background: white; border-radius: 12px;
+  padding: 11px 14px; font-size: 14px; color: #aaa;
+  border: none; box-shadow: 0 1px 4px rgba(0,0,0,0.06);
+}
+.filter-row { display: flex; gap: 8px; padding: 0 16px 12px; flex-wrap: wrap; }
+.filter-chip {
+  padding: 6px 14px; border-radius: 20px; font-size: 13px;
+  cursor: pointer; border: 1.5px solid #e0e0e0; background: white; color: #555;
+  transition: all 0.15s;
+}
+.filter-chip.active { background: #2d6a4f; color: white; border-color: #2d6a4f; }
+
+.hall-card {
+  background: white; border-radius: 14px;
+  margin: 0 16px 10px; padding: 14px 16px;
+  cursor: pointer; transition: transform 0.1s;
+  box-shadow: 0 1px 4px rgba(0,0,0,0.06);
+}
+.hall-card:active { transform: scale(0.98); }
+.hall-card h3 { font-size: 15px; font-weight: 600; color: #1a1a1a; }
+.hall-card p { font-size: 12px; color: #888; margin-top: 3px; }
+.hall-card-footer { display: flex; justify-content: space-between; align-items: center; margin-top: 10px; }
+.hall-badge { font-size: 10px; font-weight: 700; padding: 3px 8px; border-radius: 8px; }
+.badge-boys { background: #e3f2fd; color: #1565c0; }
+.badge-girls { background: #fce4ec; color: #c62828; }
+.status-updated { font-size: 12px; color: #388e3c; background: #e8f5e9; padding: 3px 10px; border-radius: 8px; }
+.status-not { font-size: 12px; color: #999; background: #f5f5f5; padding: 3px 10px; border-radius: 8px; }
+.meal-types { font-size: 11px; color: #bbb; }
+
+/* Menu screen */
+.hall-info-card {
+  background: white; border-radius: 14px;
+  margin: 12px 16px; padding: 16px;
+  box-shadow: 0 1px 4px rgba(0,0,0,0.06);
+}
+.hall-info-card h2 { font-size: 18px; font-weight: 700; color: #1a1a1a; }
+.hall-meta { font-size: 12px; color: #888; margin-top: 4px; }
+.menu-type-btn {
+  background: white; border-radius: 14px;
+  margin: 0 16px 10px; padding: 16px;
+  cursor: pointer; border: 1.5px solid #d8ead2;
+  transition: border-color 0.15s, transform 0.1s;
+  box-shadow: 0 1px 4px rgba(0,0,0,0.04);
+}
+.menu-type-btn:hover { border-color: #2d6a4f; }
+.menu-type-btn:active { transform: scale(0.98); }
+.menu-type-btn h3 { font-size: 15px; font-weight: 600; color: #1a1a1a; }
+.menu-type-btn p { font-size: 12px; color: #888; margin-top: 3px; }
+
+/* Detail */
+.meal-section { margin: 0 16px 10px; }
+.meal-section-header {
+  display: flex; align-items: center; justify-content: space-between;
+  background: white; padding: 12px 16px; border-radius: 14px 14px 0 0;
+  border-bottom: 1px solid #f0f0f0;
+}
+.meal-section-header h3 { font-size: 15px; font-weight: 600; }
+.meal-status {
+  font-size: 11px; padding: 3px 8px; border-radius: 8px; font-weight: 600;
+}
+.status-not-updated { background: #fff3e0; color: #e65100; }
+.status-finished { background: #e3f2fd; color: #1565c0; }
+.status-available { background: #e8f5e9; color: #2e7d32; }
+.status-low { background: #fff8e1; color: #f57f17; }
+
+.meal-item {
+  background: white; padding: 12px 16px;
+  border-bottom: 1px solid #f5f5f5;
+  display: flex; align-items: center; justify-content: space-between;
+}
+.meal-item:last-child { border-radius: 0 0 14px 14px; border-bottom: none; }
+.meal-item-name { font-size: 14px; font-weight: 500; color: #1a1a1a; }
+.meal-item-meta { font-size: 11px; color: #aaa; margin-top: 2px; }
+
+.meal-tabs { display: flex; gap: 6px; margin: 0 16px 10px; }
+.meal-tab {
+  padding: 7px 16px; border-radius: 20px; font-size: 13px;
+  border: 1.5px solid #2d6a4f; color: #2d6a4f; cursor: pointer; background: white;
+  transition: all 0.15s;
+}
+.meal-tab.active { background: #2d6a4f; color: white; }
+
+/* Notice / Feast */
+.accordion-btn {
+  background: white; border-radius: 14px;
+  margin: 0 16px 10px; padding: 16px;
+  display: flex; justify-content: space-between; align-items: center;
+  cursor: pointer; font-size: 15px; font-weight: 500; color: #1a1a1a;
+  box-shadow: 0 1px 4px rgba(0,0,0,0.06);
+  transition: background 0.15s;
+}
+.accordion-btn:hover { background: #f8f9ff; }
+.accordion-content {
+  background: white; margin: -8px 16px 10px;
+  border-radius: 0 0 14px 14px; padding: 0 16px 12px;
+  display: none;
+}
+.notice-item { padding: 12px 0; border-bottom: 1px solid #f0f0f0; }
+.notice-item:last-child { border-bottom: none; }
+.notice-hall { font-size: 12px; font-weight: 700; color: #2d6a4f; margin-bottom: 4px; }
+.notice-msg { font-size: 14px; color: #333; line-height: 1.5; }
+.notice-date { font-size: 11px; color: #aaa; margin-top: 4px; }
+
+/* Dashboard */
+.dash-header {
+  background: #2d6a4f; color: white; padding: 14px 20px 20px;
+}
+.dash-header h2 { font-size: 22px; font-weight: 700; line-height: 1.3; }
+.dash-header .role-label { font-size: 12px; opacity: 0.8; margin-top: 4px; }
+.dash-btn {
+  background: white; border-radius: 14px; margin: 0 16px 10px;
+  padding: 15px 18px; font-size: 15px; font-weight: 500;
+  cursor: pointer; color: #1a1a1a; transition: transform 0.1s;
+  box-shadow: 0 1px 4px rgba(0,0,0,0.06);
+}
+.dash-btn:active { transform: scale(0.98); }
+.dash-btn.primary-dash {
+  background: #2d6a4f; color: white; font-weight: 600;
+}
+
+/* Login */
+.login-form { padding: 16px; }
+.login-form h2 { font-size: 22px; font-weight: 700; color: #1a1a1a; margin-bottom: 4px; }
+.login-form .role-sub { font-size: 12px; color: #888; margin-bottom: 20px; }
+.form-label { font-size: 13px; color: #555; margin-bottom: 6px; display: block; font-weight: 500; }
+.hall-chips { display: flex; gap: 8px; margin-bottom: 16px; }
+.hall-chip {
+  width: 46px; height: 46px; border-radius: 50%;
+  border: 1.5px solid #e0e0e0; display: flex; align-items: center;
+  justify-content: center; font-size: 12px; font-weight: 700;
+  cursor: pointer; color: #555; transition: all 0.15s;
+}
+.hall-chip.active { border-color: #2d6a4f; background: #d8ead2; color: #2d6a4f; }
+.form-input {
+  width: 100%; padding: 13px 14px; border-radius: 12px;
+  border: 1.5px solid #e0e0e0; font-size: 14px;
+  color: #333; background: white; margin-bottom: 14px;
+  outline: none; transition: border-color 0.15s;
+}
+.form-input:focus { border-color: #2d6a4f; }
+
+/* Success */
+.success-screen {
+  display: flex; flex-direction: column; align-items: center;
+  justify-content: center; padding: 60px 24px 40px; min-height: 400px;
+}
+.success-icon {
+  width: 72px; height: 72px; border-radius: 50%; background: #4caf50;
+  display: flex; align-items: center; justify-content: center;
+  margin-bottom: 20px;
+  box-shadow: 0 8px 24px rgba(76,175,80,0.35);
+}
+.success-icon svg { width: 36px; height: 36px; fill: none; stroke: white; stroke-width: 3; stroke-linecap: round; stroke-linejoin: round; }
+.success-screen h2 { font-size: 24px; font-weight: 700; margin-bottom: 8px; color: #1a1a1a; }
+.success-screen p { font-size: 13px; color: #888; text-align: center; margin-bottom: 32px; line-height: 1.6; }
+
+.home-banner {
+  background: linear-gradient(135deg, #1b4332 0%, #40916c 100%);
+  color: white; padding: 14px 20px 22px;
+}
+.home-banner .logo-small {
+  width: 46px; height: 46px; background: rgba(255,255,255,0.22);
+  border-radius: 12px; display: flex; align-items: center;
+  justify-content: center; font-size: 16px; font-weight: 700; color: white;
+  margin-bottom: 12px;
+}
+.home-banner h1 { font-size: 20px; font-weight: 700; }
+.home-banner p { font-size: 13px; opacity: 0.85; margin-top: 4px; }
+
+/* Home screen nav shortcuts */
+.quick-grid {
+  display: grid; grid-template-columns: 1fr 1fr;
+  gap: 10px; padding: 0 16px 12px;
+}
+.quick-btn {
+  background: white; border-radius: 14px; padding: 14px;
+  cursor: pointer; text-align: center; transition: transform 0.1s;
+  box-shadow: 0 1px 4px rgba(0,0,0,0.06);
+}
+.quick-btn:active { transform: scale(0.97); }
+.quick-btn .q-icon { font-size: 22px; margin-bottom: 5px; }
+.quick-btn .q-label { font-size: 12px; font-weight: 600; color: #2d6a4f; }
+
+/* Home screen bottom */
+.app-footer {
+  text-align: center; font-size: 12px; color: #bbb; padding: 12px 16px 4px;
+}
+</style>
+</head>
+<body>
+<div id="toast-container"></div>
+<div class="outer">
+  <div class="label">HallMenu RU · Interactive Prototype</div>
+  <div class="phone">
+    <div class="notch"></div>
+    <div class="status-bar">
+      <span>9:41</span>
+      <span>● ● ▲</span>
+    </div>
+    <div class="screen">
+
+      <!-- SPLASH -->
+      <div class="slide active" id="s-splash">
+        <div class="splash">
+          <div class="logo">RU</div>
+          <h1>HallMenu RU</h1>
+          <div class="sub">Daily menu • Availability • Feast</div>
+          <div class="dots">
+            <div class="dot active"></div><div class="dot"></div><div class="dot"></div>
+          </div>
+          <div style="flex:1;min-height:60px"></div>
+          <button class="btn-primary" onclick="go('s-onboard1')">Get Started</button>
+          <div class="splash-footer" style="margin-top:16px">Rajshahi University • Hall Dining</div>
+        </div>
+      </div>
+
+      <!-- ONBOARD 1 -->
+      <div class="slide" id="s-onboard1">
+        <div class="onboarding" style="min-height:660px">
+          <div class="skip-btn" onclick="go('s-home')">Skip</div>
+          <div style="flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:20px 0">
+            <div style="font-size:20px;font-weight:800;color:#2d6a4f;margin-bottom:12px;letter-spacing:1px">RU</div>
+            <h2>Welcome to HallMenu RU</h2>
+            <p>Your simple dining helper for Rajshahi University halls. Check meals and updates anytime from your phone.</p>
+          </div>
+          <div class="dots-row">
+            <div class="dot active"></div><div class="dot"></div><div class="dot"></div>
+          </div>
+          <button class="btn-primary" onclick="go('s-onboard2')">Next</button>
+          <div class="onboarding-footer">Rajshahi University • Hall Dining</div>
+        </div>
+      </div>
+
+      <!-- ONBOARD 2 -->
+      <div class="slide" id="s-onboard2">
+        <div class="onboarding" style="min-height:660px">
+          <div class="skip-btn" onclick="go('s-home')">Skip</div>
+          <div style="flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center">
+            <div class="onboard-icon">🍽️</div>
+            <h2>See Daily Meals</h2>
+            <p>View breakfast, lunch, and dinner menu easily. Know what is available before going to the dining hall.</p>
+          </div>
+          <div class="dots-row">
+            <div class="dot"></div><div class="dot active"></div><div class="dot"></div>
+          </div>
+          <div class="btn-row">
+            <button class="btn-outline" onclick="go('s-onboard1')">Back</button>
+            <button class="btn-primary" style="width:55%" onclick="go('s-onboard3')">Next</button>
+          </div>
+          <div class="onboarding-footer">Rajshahi University • Hall Dining</div>
+        </div>
+      </div>
+
+      <!-- ONBOARD 3 -->
+      <div class="slide" id="s-onboard3">
+        <div class="onboarding" style="min-height:660px">
+          <div class="skip-btn" onclick="go('s-home')">Skip</div>
+          <div style="flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center">
+            <div class="onboard-icon">🔔</div>
+            <h2>Stay Updated</h2>
+            <p>Get updates about food availability, special feast menus, and important hall dining notices in one place.</p>
+          </div>
+          <div class="dots-row">
+            <div class="dot"></div><div class="dot"></div><div class="dot active"></div>
+          </div>
+          <div class="btn-row">
+            <button class="btn-outline" onclick="go('s-onboard2')">Back</button>
+            <button class="btn-primary" style="width:55%" onclick="go('s-home')">Get Started</button>
+          </div>
+          <div class="onboarding-footer">Rajshahi University • Hall Dining</div>
+        </div>
+      </div>
+
+      <!-- HOME -->
+      <div class="slide" id="s-home">
+        <div class="home-banner">
+          <div class="logo-small">RU</div>
+          <h1>HallMenu RU</h1>
+          <p>Check hall menu and food updates before you go.</p>
+        </div>
+        <div class="section-title">Choose Role</div>
+        <div class="role-card" onclick="_currentRole='student';go('s-halls')">
+          <div class="role-icon">🎓</div>
+          <div class="role-info">
+            <h3>Student</h3>
+            <p>View today's menu and food availability of different halls.</p>
+          </div>
+          <div class="role-arrow">›</div>
+        </div>
+        <div class="role-card" onclick="go('s-mod-select')">
+          <div class="role-icon">🛡️</div>
+          <div class="role-info">
+            <h3>Moderator</h3>
+            <p>Update daily menu, food status, and feast information.</p>
+          </div>
+          <div class="role-arrow">›</div>
+        </div>
+        <div class="app-footer">University of Rajshahi Hall Dining App</div>
+      </div>
+
+      <!-- HALLS LIST -->
+      <div class="slide" id="s-halls">
+        <div class="app-header">
+          <span class="back-btn" onclick="go('s-home')">←</span>
+          <span class="title">Explore Halls</span>
+        </div>
+        <div style="padding:14px 16px 0">
+          <div style="font-size:20px;font-weight:700;color:#1a1a1a">Hall List</div>
+          <div style="font-size:13px;color:#888;margin-top:4px;margin-bottom:12px">Search halls, filter by type, check updates.</div>
+        </div>
+        <input class="search-bar" id="hall-search-input" type="text" placeholder="🔍  Search hall name..." oninput="filterHalls()" style="width:calc(100% - 32px);display:block">
+        <div class="filter-row">
+          <div class="filter-chip active" id="fc-all" onclick="setHallFilter('all')">All</div>
+          <div class="filter-chip" id="fc-boys" onclick="setHallFilter('boys')">Boys</div>
+          <div class="filter-chip" id="fc-girls" onclick="setHallFilter('girls')">Girls</div>
+        </div>
+        <div style="display:flex;gap:10px;padding:0 16px 12px">
+          <div style="flex:1;background:white;border-radius:14px;padding:14px;cursor:pointer;box-shadow:0 1px 4px rgba(0,0,0,0.06)" onclick="go('s-feast')">
+            <div style="font-weight:700;color:#1a1a1a;font-size:14px">🍱 Feast</div>
+            <div style="color:#888;font-size:12px;margin-top:3px">See feast date, menu & price</div>
+          </div>
+          <div style="flex:1;background:white;border-radius:14px;padding:14px;cursor:pointer;box-shadow:0 1px 4px rgba(0,0,0,0.06)" onclick="go('s-notice')">
+            <div style="font-weight:700;color:#1a1a1a;font-size:14px">📢 Notice</div>
+            <div style="color:#888;font-size:12px;margin-top:3px">View hall dining updates</div>
+          </div>
+        </div>
+        <div class="section-title">Available Halls</div>
+        <div id="halls-list-container">
+          <div class="hall-card" data-type="boys" onclick="go('s-menu-type')">
+            <div style="display:flex;justify-content:space-between;align-items:flex-start">
+              <h3 style="flex:1;padding-right:8px">Shaheed Habibur Rahman Hall</h3>
+              <span class="hall-badge badge-boys">BOYS</span>
+            </div>
+            <p>Tap to view today's dining and canteen menu</p>
+            <div class="hall-card-footer">
+              <span class="meal-types">Breakfast • Lunch • Dinner</span>
+              <span class="status-updated">Updated today</span>
+            </div>
+          </div>
+          <div class="hall-card" data-type="boys" onclick="go('s-menu-type')">
+            <div style="display:flex;justify-content:space-between;align-items:flex-start">
+              <h3 style="flex:1;padding-right:8px">Shaheed Shamsuzzoha Hall</h3>
+              <span class="hall-badge badge-boys">BOYS</span>
+            </div>
+            <p>Tap to view today's dining and canteen menu</p>
+            <div class="hall-card-footer">
+              <span class="meal-types">Breakfast • Lunch • Dinner</span>
+              <span class="status-not">Not updated</span>
+            </div>
+          </div>
+          <div class="hall-card" data-type="girls" onclick="go('s-menu-type')">
+            <div style="display:flex;justify-content:space-between;align-items:flex-start">
+              <h3>Rokeya Hall</h3>
+              <span class="hall-badge badge-girls">GIRLS</span>
+            </div>
+            <p>Tap to view today's dining and canteen menu</p>
+            <div class="hall-card-footer">
+              <span class="meal-types">Breakfast • Lunch • Dinner</span>
+              <span class="status-updated">Updated today</span>
+            </div>
+          </div>
+          <div class="hall-card" data-type="girls" onclick="go('s-menu-type')">
+            <div style="display:flex;justify-content:space-between;align-items:flex-start">
+              <h3>Taposhi Rabeya Hall</h3>
+              <span class="hall-badge badge-girls">GIRLS</span>
+            </div>
+            <p>Tap to view today's dining and canteen menu</p>
+            <div class="hall-card-footer">
+              <span class="meal-types">Breakfast • Lunch • Dinner</span>
+              <span class="status-not">Not updated</span>
+            </div>
+          </div>
+        </div>
+        <div id="halls-empty" style="display:none;text-align:center;padding:30px 16px;font-size:13px;color:#aaa">No halls found matching your search.</div>
+      </div>
+
+      <!-- MENU TYPE SELECT -->
+      <div class="slide" id="s-menu-type">
+        <div class="app-header">
+          <span class="back-btn" onclick="go('s-halls')">←</span>
+          <span class="title">Today's Menu</span>
+        </div>
+        <div class="hall-info-card">
+          <h2>শহীদ হাবিবুর রহমান হল</h2>
+          <div class="hall-meta">Hall ID: hb</div>
+          <div class="hall-meta">Date: 2026-03-12</div>
+          <div class="hall-meta">Last updated: 3/12/2026, 2:55 AM</div>
+        </div>
+        <div style="font-size:15px;font-weight:600;color:#1a1a1a;padding:4px 16px 10px">Select Menu Type</div>
+        <div class="menu-type-btn" onclick="go('s-dining-detail')">
+          <h3>Hall Dining</h3>
+          <p>See breakfast, lunch, and dinner menu</p>
+        </div>
+        <div class="menu-type-btn" onclick="go('s-canteen-detail')">
+          <h3>Hall Canteen</h3>
+          <p>See available canteen food items</p>
+        </div>
+        <div style="text-align:center;font-size:12px;color:#ccc;padding:24px">Tap any option to view menu details</div>
+      </div>
+
+      <!-- DINING DETAIL -->
+      <div class="slide" id="s-dining-detail">
+        <div class="app-header">
+          <span class="back-btn" onclick="go('s-menu-type')">←</span>
+          <span class="title">Today's Menu</span>
+        </div>
+        <div class="hall-info-card">
+          <h2>শহীদ হাবিবুর রহমান হল</h2>
+          <div class="hall-meta">Hall ID: hb | Date: 2026-03-12</div>
+          <div class="hall-meta">Last updated: Not updated today</div>
+          <div class="hall-meta">Verified by: Not verified yet</div>
+        </div>
+        <div style="padding:0 0 8px">
+          <div style="font-size:14px;font-weight:600;color:#1a1a1a;padding:4px 16px 8px">Hall Dining</div>
+          <div class="meal-tabs">
+            <div class="meal-tab active" id="tab-breakfast" onclick="switchMealTab('breakfast')">Breakfast</div>
+            <div class="meal-tab" id="tab-lunch" onclick="switchMealTab('lunch')">Lunch</div>
+            <div class="meal-tab" id="tab-dinner" onclick="switchMealTab('dinner')">Dinner</div>
+          </div>
+        </div>
+        <!-- Breakfast section -->
+        <div class="meal-section" id="meal-section-breakfast">
+          <div class="meal-section-header">
+            <h3>Breakfast</h3>
+            <span class="meal-status status-finished">FINISHED</span>
+          </div>
+          <div class="meal-item" onclick="openFoodDetail('Vat','৳10','100','breakfast')" style="cursor:pointer">
+            <div>
+              <div class="meal-item-name">Vat</div>
+              <div class="meal-item-meta">৳10 • Remaining: 100</div>
+            </div>
+            <span class="meal-status status-available">AVAILABLE</span>
+          </div>
+          <div class="meal-item" style="border-radius:0 0 14px 14px;cursor:pointer" onclick="openFoodDetail('Dim','৳20','100','breakfast')">
+            <div>
+              <div class="meal-item-name">Dim</div>
+              <div class="meal-item-meta">৳20 • Remaining: 100</div>
+            </div>
+            <span class="meal-status status-low">LOW</span>
+          </div>
+          <div style="background:white;padding:10px 16px;border-top:1px solid #f5f5f5;border-radius:0 0 14px 14px;font-size:12px;color:#aaa">NOTE: Vat, Dim</div>
+        </div>
+        <!-- Lunch section -->
+        <div class="meal-section" id="meal-section-lunch" style="display:none">
+          <div class="meal-section-header">
+            <h3>Lunch</h3>
+            <span class="meal-status status-available">AVAILABLE</span>
+          </div>
+          <div class="meal-item" onclick="openFoodDetail('Dal','৳15','60','lunch')" style="cursor:pointer">
+            <div>
+              <div class="meal-item-name">Dal</div>
+              <div class="meal-item-meta">৳15 • Remaining: 60</div>
+            </div>
+            <span class="meal-status status-available">AVAILABLE</span>
+          </div>
+          <div class="meal-item" style="border-radius:0 0 14px 14px;cursor:pointer" onclick="openFoodDetail('Chicken Curry','৳50','45','lunch')">
+            <div>
+              <div class="meal-item-name">Chicken Curry</div>
+              <div class="meal-item-meta">৳50 • Remaining: 45</div>
+            </div>
+            <span class="meal-status status-low">LOW</span>
+          </div>
+          <div style="background:white;padding:10px 16px;border-top:1px solid #f5f5f5;border-radius:0 0 14px 14px;font-size:12px;color:#aaa">NOTE: Dal, Chicken Curry</div>
+        </div>
+        <!-- Dinner section -->
+        <div class="meal-section" id="meal-section-dinner" style="display:none">
+          <div class="meal-section-header">
+            <h3>Dinner</h3>
+            <span class="meal-status status-available">AVAILABLE</span>
+          </div>
+          <div class="meal-item" onclick="openFoodDetail('Roti','৳8','120','dinner')" style="cursor:pointer">
+            <div>
+              <div class="meal-item-name">Roti</div>
+              <div class="meal-item-meta">৳8 • Remaining: 120</div>
+            </div>
+            <span class="meal-status status-available">AVAILABLE</span>
+          </div>
+          <div style="background:white;padding:10px 16px;border-top:1px solid #f5f5f5;border-radius:0 0 14px 14px;font-size:12px;color:#aaa">NOTE: Roti</div>
+        </div>
+        <div class="meal-section">
+          <div class="meal-section-header">
+            <h3>Canteen</h3>
+            <span class="meal-status status-available">AVAILABLE</span>
+          </div>
+          <div class="meal-item" onclick="openFoodDetail('Briyani','৳50','70','canteen')" style="cursor:pointer">
+            <div>
+              <div class="meal-item-name">Briyani</div>
+              <div class="meal-item-meta">৳50 • Remaining: 70</div>
+            </div>
+            <span class="meal-status status-available">AVAILABLE</span>
+          </div>
+          <div class="meal-item" style="border-radius:0 0 14px 14px;cursor:pointer" onclick="openFoodDetail('Pizza','৳100','100','canteen')">
+            <div>
+              <div class="meal-item-name">Pizza</div>
+              <div class="meal-item-meta">৳100 • Remaining: 100</div>
+            </div>
+            <span class="meal-status status-low">LOW</span>
+          </div>
+          <div style="background:white;padding:10px 16px;border-top:1px solid #f5f5f5;border-radius:0 0 14px 14px;font-size:12px;color:#aaa">NOTE: Briyani, Pizza</div>
+        </div>
+      </div>
+
+      <!-- CANTEEN DETAIL -->
+      <div class="slide" id="s-canteen-detail">
+        <div class="app-header">
+          <span class="back-btn" onclick="go('s-menu-type')">←</span>
+          <span class="title">Today's Menu</span>
+        </div>
+        <div class="hall-info-card">
+          <h2>শহীদ হাবিবুর রহমান হল</h2>
+          <div class="hall-meta">Hall Canteen | Date: 2026-03-12</div>
+        </div>
+        <div class="meal-section">
+          <div class="meal-section-header">
+            <h3>Hall Canteen</h3>
+            <span class="meal-status status-available">ACTIVE</span>
+          </div>
+          <div class="meal-item" onclick="openFoodDetail('Briyani','৳50','70','canteen')" style="cursor:pointer">
+            <div>
+              <div class="meal-item-name">Briyani</div>
+              <div class="meal-item-meta">৳50 • Remaining: 70</div>
+            </div>
+            <span class="meal-status status-available">AVAILABLE</span>
+          </div>
+          <div class="meal-item" style="border-radius:0 0 14px 14px;cursor:pointer" onclick="openFoodDetailById('canteen_dim')">
+            <div>
+              <div class="meal-item-name">Dim</div>
+              <div class="meal-item-meta">৳20 • Remaining: 50</div>
+            </div>
+            <span class="meal-status status-low">LOW</span>
+          </div>
+          <div style="background:white;padding:10px 16px;border-top:1px solid #f5f5f5;border-radius:0 0 14px 14px;font-size:12px;color:#aaa">NOTE: Briyani, Dim</div>
+        </div>
+      </div>
+
+      <!-- NOTICE -->
+      <div class="slide" id="s-notice">
+        <div class="app-header">
+          <span class="back-btn" onclick="go('s-halls')">←</span>
+          <span class="title">Notices</span>
+        </div>
+        <div style="padding:16px 16px 8px;font-size:20px;font-weight:700;color:#1a1a1a">Notice Updates</div>
+        <div class="accordion-btn" onclick="toggleAcc('acc-dn')">
+          <span>Dining Notices</span><span id="acc-dn-arrow" style="font-size:18px;color:#aaa">∨</span>
+        </div>
+        <div class="accordion-content" id="acc-dn">
+          <div class="notice-item">
+            <div class="notice-hall">শহীদ হাবিবুর রহমান হল</div>
+            <div class="notice-msg">Today's lunch will be served 30 minutes late due to kitchen maintenance.</div>
+            <div class="notice-date">10 March 2026</div>
+          </div>
+          <div class="notice-item">
+            <div class="notice-hall">রোকেয়া হল</div>
+            <div class="notice-msg">Dinner rice is limited today. Students are requested to come early.</div>
+            <div class="notice-date">11 March 2026</div>
+          </div>
+        </div>
+        <div class="accordion-btn" onclick="toggleAcc('acc-cn')">
+          <span>Canteen Notices</span><span id="acc-cn-arrow" style="font-size:18px;color:#aaa">∨</span>
+        </div>
+        <div class="accordion-content" id="acc-cn">
+          <div class="notice-item">
+            <div class="notice-hall">শহীদ শামসুজ্জোহা হল ক্যান্টিন</div>
+            <div class="notice-msg">Canteen will remain closed after 8 PM for cleaning work.</div>
+            <div class="notice-date">12 March 2026</div>
+          </div>
+          <div class="notice-item">
+            <div class="notice-hall">তাপসী রাবেয়া হল ক্যান্টিন</div>
+            <div class="notice-msg">Tea and snacks will be unavailable this evening due to supply shortage.</div>
+            <div class="notice-date">13 March 2026</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- FEAST -->
+      <div class="slide" id="s-feast">
+        <div class="app-header">
+          <span class="back-btn" onclick="go('s-halls')">←</span>
+          <span class="title">Feast</span>
+        </div>
+        <div style="padding:16px 16px 8px;font-size:20px;font-weight:700;color:#1a1a1a">Feast Updates</div>
+        <div class="accordion-btn" onclick="toggleAcc('acc-df')">
+          <span>Hall Dining Feast</span><span id="acc-df-arrow" style="font-size:18px;color:#aaa">∨</span>
+        </div>
+        <div class="accordion-content" id="acc-df">
+          <div class="notice-item">
+            <div class="notice-hall">শহীদ হাবিবুর রহমান হল</div>
+            <div class="notice-msg">Feast menu: Polao, roast, beef curry, salad, dessert.</div>
+            <div style="display:flex;justify-content:space-between;margin-top:5px">
+              <span class="notice-date">12 March 2026</span>
+              <span style="font-size:12px;color:#2d6a4f;font-weight:700">৳120</span>
+            </div>
+          </div>
+          <div class="notice-item">
+            <div class="notice-hall">রোকেয়া হল</div>
+            <div class="notice-msg">Feast menu: Khichuri, chicken fry, egg curry, vegetable, mishti.</div>
+            <div style="display:flex;justify-content:space-between;margin-top:5px">
+              <span class="notice-date">15 March 2026</span>
+              <span style="font-size:12px;color:#2d6a4f;font-weight:700">৳100</span>
+            </div>
+          </div>
+        </div>
+        <div class="accordion-btn" onclick="toggleAcc('acc-cf')">
+          <span>Hall Canteen Feast</span><span id="acc-cf-arrow" style="font-size:18px;color:#aaa">∨</span>
+        </div>
+        <div class="accordion-content" id="acc-cf">
+          <div class="notice-item">
+            <div class="notice-hall">শহীদ শামসুজ্জোহা হল ক্যান্টিন</div>
+            <div class="notice-msg">Feast menu: Fried rice, chicken grill, dal, soft drinks.</div>
+            <div style="display:flex;justify-content:space-between;margin-top:5px">
+              <span class="notice-date">18 March 2026</span>
+              <span style="font-size:12px;color:#2d6a4f;font-weight:700">৳150</span>
+            </div>
+          </div>
+          <div class="notice-item">
+            <div class="notice-hall">তাপসী রাবেয়া হল ক্যান্টিন</div>
+            <div class="notice-msg">Feast menu: Tehari, chicken roast, salad, jilapi.</div>
+            <div style="display:flex;justify-content:space-between;margin-top:5px">
+              <span class="notice-date">20 March 2026</span>
+              <span style="font-size:12px;color:#2d6a4f;font-weight:700">৳130</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- MODERATOR SELECT -->
+      <div class="slide" id="s-mod-select">
+        <div class="app-header">
+          <span class="back-btn" onclick="go('s-home')">←</span>
+          <span class="title">Moderator</span>
+        </div>
+        <div style="display:flex;flex-direction:column;align-items:center;justify-content:center;padding:50px 24px">
+          <div style="font-size:24px;font-weight:700;color:#1a1a1a;margin-bottom:6px">Moderator</div>
+          <div style="font-size:13px;color:#888;margin-bottom:40px">Select your responsibility</div>
+          <button class="btn-primary" onclick="go('s-mod-login-dining')">Dining Moderator</button>
+          <button class="btn-secondary" onclick="go('s-mod-login-canteen')">Canteen Moderator</button>
+          <div style="font-size:13px;color:#2d6a4f;margin-top:20px;cursor:pointer" onclick="go('s-home')">← Back</div>
+        </div>
+      </div>
+
+      <!-- MOD LOGIN DINING -->
+      <div class="slide" id="s-mod-login-dining">
+        <div class="app-header">
+          <span class="back-btn" onclick="go('s-mod-select')">←</span>
+          <span class="title">Moderator Login</span>
+        </div>
+        <div class="login-form">
+          <h2>Dining Moderator Login</h2>
+          <div class="role-sub">Role locked: DINING</div>
+          <label class="form-label">Phone</label>
+          <input class="form-input" type="text" placeholder="017xxxxxxxx">
+          <label class="form-label">Password</label>
+          <input class="form-input" type="password" placeholder="••••">
+          <button class="btn-primary" onclick="go('s-dash-dining')">Login</button>
+          <div style="font-size:13px;color:#2d6a4f;text-align:center;margin-top:16px;cursor:pointer" onclick="go('s-mod-select')">← Back</div>
+        </div>
+      </div>
+
+      <!-- MOD LOGIN CANTEEN -->
+      <div class="slide" id="s-mod-login-canteen">
+        <div class="app-header">
+          <span class="back-btn" onclick="go('s-mod-select')">←</span>
+          <span class="title">Moderator Login</span>
+        </div>
+        <div class="login-form">
+          <h2>Canteen Moderator Login</h2>
+          <div class="role-sub">Role locked: CANTEEN</div>
+          <label class="form-label">Phone</label>
+          <input class="form-input" type="text" placeholder="017xxxxxxxx">
+          <label class="form-label">Password</label>
+          <input class="form-input" type="password" placeholder="••••">
+          <button class="btn-primary" onclick="go('s-dash-canteen')">Login</button>
+          <div style="font-size:13px;color:#2d6a4f;text-align:center;margin-top:16px;cursor:pointer" onclick="go('s-mod-select')">← Back</div>
+        </div>
+      </div>
+
+      <!-- DASHBOARD DINING -->
+      <div class="slide" id="s-dash-dining">
+        <div class="dash-header" style="padding:16px 20px 22px">
+          <div style="display:flex;justify-content:space-between;align-items:flex-start">
+            <div>
+              <h2 style="font-size:20px">Shaheed Habibur<br>Rahman Hall</h2>
+              <div class="role-label">Hall: shaheed_habibur • Role: Dining Moderator</div>
+              <div style="display:flex;align-items:center;gap:6px;margin-top:8px">
+                <span style="background:rgba(255,255,255,0.22);border-radius:8px;padding:3px 10px;font-size:12px;font-weight:700;letter-spacing:0.3px">🧑‍💼 Dining Moderator</span>
+              </div>
+              <div style="font-size:12px;opacity:0.75;margin-top:5px">📅 2026-03-30</div>
+            </div>
+            <button onclick="showLogout('dining')" style="background:rgba(255,255,255,0.15);border:1.5px solid rgba(255,255,255,0.35);color:white;border-radius:10px;padding:6px 12px;font-size:12px;font-weight:600;cursor:pointer;white-space:nowrap">⏻ Logout</button>
+          </div>
+        </div>
+        <div style="height:12px"></div>
+        <div class="dash-btn primary-dash" onclick="go('s-quick-update')" style="display:flex;align-items:center;gap:12px">
+          <span style="font-size:20px">⚡</span>
+          <div><div style="font-size:15px;font-weight:600">Quick Status (Item-wise)</div><div style="font-size:12px;opacity:0.8;margin-top:1px">Quickly update food availability status</div></div>
+          <span style="margin-left:auto;opacity:0.6">›</span>
+        </div>
+        <div class="dash-btn" onclick="go('s-update-menu')" style="display:flex;align-items:center;gap:12px">
+          <span style="font-size:20px">🍽️</span>
+          <div><div style="font-size:15px;font-weight:600">Update Dining Menu</div><div style="font-size:12px;color:#888;margin-top:1px">Add or edit today's full dining menu</div></div>
+          <span style="margin-left:auto;color:#ccc">›</span>
+        </div>
+        <div class="dash-btn" onclick="go('s-post-notice')" style="display:flex;align-items:center;gap:12px">
+          <span style="font-size:20px">📢</span>
+          <div><div style="font-size:15px;font-weight:600">Post Notice</div><div style="font-size:12px;color:#888;margin-top:1px">Announce delays, changes or updates</div></div>
+          <span style="margin-left:auto;color:#ccc">›</span>
+        </div>
+        <div class="dash-btn" onclick="go('s-add-feast')" style="display:flex;align-items:center;gap:12px">
+          <span style="font-size:20px">🎉</span>
+          <div><div style="font-size:15px;font-weight:600">Add Feast</div><div style="font-size:12px;color:#888;margin-top:1px">Schedule a special feast event</div></div>
+          <span style="margin-left:auto;color:#ccc">›</span>
+        </div>
+        <div class="dash-btn" onclick="go('s-daily-reset')" style="display:flex;align-items:center;gap:12px">
+          <span style="font-size:20px">🔄</span>
+          <div><div style="font-size:15px;font-weight:600">Daily Reset</div><div style="font-size:12px;color:#888;margin-top:1px">Duplicate yesterday or clear for today</div></div>
+          <span style="margin-left:auto;color:#ccc">›</span>
+        </div>
+        <div class="dash-btn" onclick="go('s-verification')" style="display:flex;align-items:center;gap:12px">
+          <span style="font-size:20px;background:#4caf50;border-radius:6px;display:inline-flex;align-items:center;justify-content:center;width:28px;height:28px;flex-shrink:0">✔️</span>
+          <div><div style="font-size:15px;font-weight:600">Verification</div><div style="font-size:12px;color:#888;margin-top:1px">View update history and verify records</div></div>
+          <span style="margin-left:auto;color:#ccc">›</span>
+        </div>
+        <div class="dash-btn" onclick="openAvailableFood('dining')" style="display:flex;align-items:center;gap:12px">
+          <span style="font-size:20px">🥘</span>
+          <div><div style="font-size:15px;font-weight:600">Available Food Menu</div><div style="font-size:12px;color:#888;margin-top:1px">View &amp; serve food items with quantity</div></div>
+          <span style="margin-left:auto;color:#ccc">›</span>
+        </div>
+        <div style="height:4px"></div>
+        <div class="dash-btn" onclick="go('s-home')" style="display:flex;align-items:center;gap:12px;justify-content:center;color:#555">
+          <span style="font-size:16px">🏠</span>
+          <span style="font-size:15px;font-weight:600">Back to Home</span>
+        </div>
+        <div style="text-align:center;padding:8px 0 12px">
+          <span onclick="showLogout('dining')" style="color:#e53935;font-size:14px;font-weight:600;cursor:pointer">Logout</span>
+        </div>
+      </div>
+
+      <!-- DASHBOARD CANTEEN -->
+      <div class="slide" id="s-dash-canteen">
+        <div class="dash-header" style="padding:16px 20px 22px;background:linear-gradient(135deg,#2d6a4f,#7e57c2)">
+          <div style="display:flex;justify-content:space-between;align-items:flex-start">
+            <div>
+              <h2 style="font-size:20px">Shaheed Habibur<br>Rahman Hall</h2>
+              <div class="role-label">Hall: shaheed_habibur • Role: Canteen Moderator</div>
+              <div style="display:flex;align-items:center;gap:6px;margin-top:8px">
+                <span style="background:rgba(255,255,255,0.22);border-radius:8px;padding:3px 10px;font-size:12px;font-weight:700;letter-spacing:0.3px">🧑‍🍳 Canteen Moderator</span>
+              </div>
+              <div style="font-size:12px;opacity:0.75;margin-top:5px">📅 2026-03-30</div>
+            </div>
+            <button onclick="showLogout('canteen')" style="background:rgba(255,255,255,0.15);border:1.5px solid rgba(255,255,255,0.35);color:white;border-radius:10px;padding:6px 12px;font-size:12px;font-weight:600;cursor:pointer;white-space:nowrap">⏻ Logout</button>
+          </div>
+        </div>
+        <div style="height:12px"></div>
+        <div class="dash-btn primary-dash" onclick="go('s-quick-canteen')" style="display:flex;align-items:center;gap:12px;background:linear-gradient(135deg,#2d6a4f,#7e57c2)">
+          <span style="font-size:20px">⚡</span>
+          <div><div style="font-size:15px;font-weight:600">Quick Canteen Status (Item-wise)</div><div style="font-size:12px;opacity:0.8;margin-top:1px">Quickly update canteen availability</div></div>
+          <span style="margin-left:auto;opacity:0.6">›</span>
+        </div>
+        <div class="dash-btn" onclick="go('s-update-canteen')" style="display:flex;align-items:center;gap:12px">
+          <span style="font-size:20px">🛒</span>
+          <div><div style="font-size:15px;font-weight:600">Update Canteen Menu</div><div style="font-size:12px;color:#888;margin-top:1px">Add or edit today's canteen items</div></div>
+          <span style="margin-left:auto;color:#ccc">›</span>
+        </div>
+        <div class="dash-btn" onclick="go('s-post-notice-canteen')" style="display:flex;align-items:center;gap:12px">
+          <span style="font-size:20px">📢</span>
+          <div><div style="font-size:15px;font-weight:600">Post Notice</div><div style="font-size:12px;color:#888;margin-top:1px">Announce delays, changes or updates</div></div>
+          <span style="margin-left:auto;color:#ccc">›</span>
+        </div>
+        <div class="dash-btn" onclick="go('s-add-feast-canteen')" style="display:flex;align-items:center;gap:12px">
+          <span style="font-size:20px">🎉</span>
+          <div><div style="font-size:15px;font-weight:600">Add Feast</div><div style="font-size:12px;color:#888;margin-top:1px">Schedule a special feast event</div></div>
+          <span style="margin-left:auto;color:#ccc">›</span>
+        </div>
+        <div class="dash-btn" onclick="go('s-daily-reset-canteen')" style="display:flex;align-items:center;gap:12px">
+          <span style="font-size:20px">🔄</span>
+          <div><div style="font-size:15px;font-weight:600">Daily Reset</div><div style="font-size:12px;color:#888;margin-top:1px">Duplicate yesterday or clear for today</div></div>
+          <span style="margin-left:auto;color:#ccc">›</span>
+        </div>
+        <div class="dash-btn" onclick="go('s-verification-canteen')" style="display:flex;align-items:center;gap:12px">
+          <span style="font-size:20px;background:#4caf50;border-radius:6px;display:inline-flex;align-items:center;justify-content:center;width:28px;height:28px;flex-shrink:0">✔️</span>
+          <div><div style="font-size:15px;font-weight:600">Verification</div><div style="font-size:12px;color:#888;margin-top:1px">View update history and verify records</div></div>
+          <span style="margin-left:auto;color:#ccc">›</span>
+        </div>
+        <div class="dash-btn" onclick="openAvailableFood('canteen')" style="display:flex;align-items:center;gap:12px">
+          <span style="font-size:20px">🥘</span>
+          <div><div style="font-size:15px;font-weight:600">Available Food Menu</div><div style="font-size:12px;color:#888;margin-top:1px">View &amp; serve food items with quantity</div></div>
+          <span style="margin-left:auto;color:#ccc">›</span>
+        </div>
+        <div style="height:4px"></div>
+        <div class="dash-btn" onclick="go('s-home')" style="display:flex;align-items:center;gap:12px;justify-content:center;color:#555">
+          <span style="font-size:16px">🏠</span>
+          <span style="font-size:15px;font-weight:600">Back to Home</span>
+        </div>
+        <div style="text-align:center;padding:8px 0 12px">
+          <span onclick="showLogout('canteen')" style="color:#e53935;font-size:14px;font-weight:600;cursor:pointer">Logout</span>
+        </div>
+      </div>
+
+      <!-- QUICK UPDATE -->
+      <div class="slide" id="s-quick-update">
+        <div class="app-header">
+          <span class="back-btn" onclick="go('s-dash-dining')">←</span>
+          <span class="title">Quick Update</span>
+        </div>
+        <div style="padding:16px 16px 4px;font-size:18px;font-weight:700;color:#1a1a1a">Quick Status Update (Item-wise)</div>
+        <div style="padding:0 16px 12px;font-size:12px;color:#888">Hall: hb • Date: 2026-03-12</div>
+        <div class="card">
+          <div style="font-size:15px;font-weight:600;margin-bottom:10px">Breakfast</div>
+          <div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:12px">
+            <span class="filter-chip active" onclick="setBulkStatus(this,'qs-b')">All Available</span>
+            <span class="filter-chip" onclick="setBulkStatus(this,'qs-b')">All Low</span>
+            <span class="filter-chip" onclick="setBulkStatus(this,'qs-b')">All Finished</span>
+          </div>
+          <div style="border-top:1px solid #f0f0f0;padding-top:12px">
+            <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px">
+              <div><div style="font-size:14px;font-weight:500">Vat</div><div style="font-size:11px;color:#aaa">Count: 100</div></div>
+              <div style="display:flex;gap:5px" class="qs-b">
+                <span class="filter-chip active" style="padding:4px 10px;font-size:12px" onclick="toggleStatusChip(this)">Available</span>
+                <span class="filter-chip" style="padding:4px 10px;font-size:12px" onclick="toggleStatusChip(this)">Low</span>
+                <span class="filter-chip" style="padding:4px 10px;font-size:12px" onclick="toggleStatusChip(this)">Finished</span>
+              </div>
+            </div>
+            <div style="display:flex;justify-content:space-between;align-items:center">
+              <div><div style="font-size:14px;font-weight:500">Dim</div><div style="font-size:11px;color:#aaa">Count: 80</div></div>
+              <div style="display:flex;gap:5px" class="qs-b">
+                <span class="filter-chip" style="padding:4px 10px;font-size:12px" onclick="toggleStatusChip(this)">Available</span>
+                <span class="filter-chip active" style="padding:4px 10px;font-size:12px" onclick="toggleStatusChip(this)">Low</span>
+                <span class="filter-chip" style="padding:4px 10px;font-size:12px" onclick="toggleStatusChip(this)">Finished</span>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="card">
+          <div style="font-size:15px;font-weight:600;margin-bottom:10px">Lunch</div>
+          <div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:8px">
+            <span class="filter-chip" onclick="setBulkStatus(this,'qs-l')">All Available</span>
+            <span class="filter-chip" onclick="setBulkStatus(this,'qs-l')">All Low</span>
+            <span class="filter-chip" onclick="setBulkStatus(this,'qs-l')">All Finished</span>
+          </div>
+          <div style="font-size:12px;color:#aaa;padding-top:8px">No items yet. Add items from Menu Editor first.</div>
+        </div>
+        <div style="padding:0 16px 20px">
+          <button class="btn-primary" onclick="go('s-dash-dining');showToast('✓ Status update সংরক্ষিত হয়েছে', 'success')">Save Updates</button>
+        </div>
+      </div>
+
+      <!-- UPDATE MENU -->
+      <div class="slide" id="s-update-menu">
+        <div class="app-header">
+          <span class="back-btn" onclick="go('s-dash-dining')">←</span>
+          <span class="title">Update Menu</span>
+        </div>
+        <div style="padding:16px 16px 4px;font-size:18px;font-weight:700;color:#1a1a1a">Update Today Menu (Item-wise)</div>
+        <div style="padding:0 16px 12px;font-size:12px;color:#888">Hall: hb • Date: 2026-03-12</div>
+        <div class="card" id="um-breakfast-card">
+          <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px">
+            <div style="font-size:15px;font-weight:600">Breakfast</div>
+            <span class="filter-chip" style="color:#2d6a4f;border-color:#2d6a4f;cursor:pointer" onclick="addMenuItemRow('um-breakfast-items','breakfast')">+ Add item</span>
+          </div>
+          <div id="um-breakfast-items"><div style="font-size:13px;color:#aaa">No items yet</div></div>
+        </div>
+        <div class="card" id="um-lunch-card">
+          <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px">
+            <div style="font-size:15px;font-weight:600">Lunch</div>
+            <span class="filter-chip" style="color:#2d6a4f;border-color:#2d6a4f;cursor:pointer" onclick="addMenuItemRow('um-lunch-items','lunch')">+ Add item</span>
+          </div>
+          <div id="um-lunch-items"><div style="font-size:13px;color:#aaa">No items yet</div></div>
+        </div>
+        <div class="card" id="um-dinner-card">
+          <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px">
+            <div style="font-size:15px;font-weight:600">Dinner</div>
+            <span class="filter-chip" style="color:#2d6a4f;border-color:#2d6a4f;cursor:pointer" onclick="addMenuItemRow('um-dinner-items','dinner')">+ Add item</span>
+          </div>
+          <div id="um-dinner-items"><div style="font-size:13px;color:#aaa">No items yet</div></div>
+        </div>
+        <div style="padding:0 16px 20px">
+          <button class="btn-secondary" style="margin-bottom:10px" onclick="go('s-preview-dining')">Preview</button>
+          <button class="btn-primary" onclick="go('s-success-dining');showToast('✓ Menu সংরক্ষিত হয়েছে', 'success')">Save Menu</button>
+        </div>
+      </div>
+
+      <!-- PREVIEW DINING -->
+      <div class="slide" id="s-preview-dining">
+        <div class="app-header">
+          <span class="back-btn" onclick="go('s-update-menu')">←</span>
+          <span class="title">Preview</span>
+        </div>
+        <div style="padding:16px 16px 4px;font-size:18px;font-weight:700;color:#1a1a1a">Preview Before Save</div>
+        <div style="padding:0 16px 12px;font-size:12px;color:#888">Student side preview</div>
+        <div class="hall-info-card">
+          <h2>Shaheed Habibur Rahman Hall</h2>
+          <div class="hall-meta">Date: 2026-03-12 | Preview mode before save</div>
+        </div>
+        <div id="preview-dining-content"></div>
+        <div style="padding:0 16px 20px;display:flex;gap:10px">
+          <button class="btn-outline" onclick="go('s-update-menu')">Back to Edit</button>
+          <button class="btn-primary" style="width:55%" onclick="go('s-success-dining')">Confirm Save</button>
+        </div>
+      </div>
+
+      <!-- SUCCESS DINING -->
+      <div class="slide" id="s-success-dining">
+        <div style="background:white;margin:20px 16px;border-radius:16px;padding:30px 24px;box-shadow:0 1px 8px rgba(0,0,0,0.08)">
+          <div class="success-screen" style="padding:20px 0 10px">
+            <div class="success-icon">
+              <svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg>
+            </div>
+            <h2>Success</h2>
+            <p>Menu saved successfully. Students can now see the updated information.</p>
+            <button class="btn-primary" onclick="go('s-dash-dining')">Back to Dashboard</button>
+            <button class="btn-secondary" onclick="go('s-update-menu')">Edit Again</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- QUICK CANTEEN -->
+      <div class="slide" id="s-quick-canteen">
+        <div class="app-header">
+          <span class="back-btn" onclick="go('s-dash-canteen')">←</span>
+          <span class="title">Quick Canteen Update</span>
+        </div>
+        <div style="padding:16px 16px 4px;font-size:18px;font-weight:700;color:#1a1a1a">Quick Canteen Status (Item-wise)</div>
+        <div style="padding:0 16px 12px;font-size:12px;color:#888">Hall: hb • Date: 2026-03-12</div>
+        <div class="card">
+          <div style="font-size:15px;font-weight:600;margin-bottom:10px">Canteen Items</div>
+          <div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:14px">
+            <span class="filter-chip active" onclick="setBulkStatus(this,'qs-c')">All Available</span>
+            <span class="filter-chip" onclick="setBulkStatus(this,'qs-c')">All Low</span>
+            <span class="filter-chip" onclick="setBulkStatus(this,'qs-c')">All Finished</span>
+          </div>
+          <div style="border-top:1px solid #f0f0f0;padding-top:12px">
+            <div style="margin-bottom:14px">
+              <div style="font-size:14px;font-weight:500;margin-bottom:5px">Briyani <span style="font-size:11px;color:#aaa;font-weight:400">৳50</span></div>
+              <input class="form-input" style="padding:8px 12px;margin-bottom:6px" value="70" placeholder="Count">
+              <div style="display:flex;gap:6px" class="qs-c">
+                <span class="filter-chip active" style="padding:4px 10px;font-size:12px" onclick="toggleStatusChip(this)">Available</span>
+                <span class="filter-chip" style="padding:4px 10px;font-size:12px" onclick="toggleStatusChip(this)">Low</span>
+                <span class="filter-chip" style="padding:4px 10px;font-size:12px" onclick="toggleStatusChip(this)">Finished</span>
+              </div>
+            </div>
+            <div>
+              <div style="font-size:14px;font-weight:500;margin-bottom:5px">Dim <span style="font-size:11px;color:#aaa;font-weight:400">৳20</span></div>
+              <input class="form-input" style="padding:8px 12px;margin-bottom:6px" value="50" placeholder="Count">
+              <div style="display:flex;gap:6px" class="qs-c">
+                <span class="filter-chip" style="padding:4px 10px;font-size:12px" onclick="toggleStatusChip(this)">Available</span>
+                <span class="filter-chip active" style="padding:4px 10px;font-size:12px" onclick="toggleStatusChip(this)">Low</span>
+                <span class="filter-chip" style="padding:4px 10px;font-size:12px" onclick="toggleStatusChip(this)">Finished</span>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div style="padding:0 16px 20px">
+          <button class="btn-primary" onclick="go('s-dash-canteen');showToast('✓ Canteen status update সংরক্ষিত', 'success')">Save Updates</button>
+        </div>
+      </div>
+
+      <!-- UPDATE CANTEEN -->
+      <div class="slide" id="s-update-canteen">
+        <div class="app-header">
+          <span class="back-btn" onclick="go('s-dash-canteen')">←</span>
+          <span class="title">Update Canteen Menu</span>
+        </div>
+        <div style="padding:16px 16px 4px;font-size:18px;font-weight:700;color:#1a1a1a">Update Canteen Menu (Item-wise)</div>
+        <div style="padding:0 16px 12px;font-size:12px;color:#888">Hall: hb • Date: 2026-03-12</div>
+        <div class="card">
+          <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px">
+            <div style="font-size:15px;font-weight:600">Canteen</div>
+            <span class="filter-chip" style="color:#2d6a4f;border-color:#2d6a4f;cursor:pointer" onclick="addMenuItemRow('uc-canteen-items','canteen')">+ Add item</span>
+          </div>
+          <div id="uc-canteen-items"><div style="font-size:13px;color:#aaa">No items yet</div></div>
+        </div>
+        <div style="padding:0 16px 20px">
+          <button class="btn-secondary" style="margin-bottom:10px" onclick="go('s-preview-canteen')">Preview</button>
+          <button class="btn-primary" onclick="go('s-success-canteen');showToast('✓ Canteen menu সংরক্ষিত', 'success')">Save Canteen Menu</button>
+        </div>
+      </div>
+
+      <!-- PREVIEW CANTEEN -->
+      <div class="slide" id="s-preview-canteen">
+        <div class="app-header">
+          <span class="back-btn" onclick="go('s-update-canteen')">←</span>
+          <span class="title">Preview</span>
+        </div>
+        <div style="padding:16px 16px 4px;font-size:18px;font-weight:700;color:#1a1a1a">Canteen Preview</div>
+        <div style="padding:0 16px 12px;font-size:12px;color:#888">Student side preview before save</div>
+        <div class="hall-info-card">
+          <h2>Shaheed Habibur Rahman Hall</h2>
+          <div class="hall-meta">Hall: hb</div>
+          <div class="hall-meta">Date: 2026-03-12</div>
+        </div>
+        <div id="preview-canteen-content"></div>
+        <div style="padding:0 16px 20px;display:flex;gap:10px">
+          <button class="btn-outline" onclick="go('s-update-canteen')">Back to Edit</button>
+          <button class="btn-primary" style="width:55%" onclick="go('s-success-canteen')">Confirm Save</button>
+        </div>
+      </div>
+
+      <!-- SUCCESS CANTEEN -->
+      <div class="slide" id="s-success-canteen">
+        <div style="background:white;margin:20px 16px;border-radius:16px;padding:30px 24px;box-shadow:0 1px 8px rgba(0,0,0,0.08)">
+          <div class="success-screen" style="padding:20px 0 10px">
+            <div class="success-icon">
+              <svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg>
+            </div>
+            <h2>Success</h2>
+            <p>Menu saved successfully. Students can now see the updated information.</p>
+            <button class="btn-primary" onclick="go('s-dash-canteen')">Back to Dashboard</button>
+            <button class="btn-secondary" onclick="go('s-update-canteen')">Edit Again</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- POST NOTICE (DINING) -->
+      <div class="slide" id="s-post-notice">
+        <div class="app-header">
+          <span class="back-btn" onclick="go('s-dash-dining')">←</span>
+          <span class="title">Post Notice</span>
+        </div>
+        <div class="login-form">
+          <h2>Post Notice</h2>
+          <div class="role-sub">Hall: hb • Dining</div>
+          <label class="form-label">Type</label>
+          <select class="form-input" id="pn-type">
+            <option value="delay">⏰ Delay</option>
+            <option value="closure">🔒 Closure</option>
+            <option value="shortage">⚠️ Shortage</option>
+            <option value="special">🎉 Special</option>
+          </select>
+          <label class="form-label">Title</label>
+          <input class="form-input" id="pn-title" placeholder="Enter notice title">
+          <label class="form-label">Message</label>
+          <textarea class="form-input" id="pn-msg" style="height:80px;resize:none"></textarea>
+          <label class="form-label">Expires in (hours)</label>
+          <input class="form-input" id="pn-exp" value="6" type="number" min="1" max="72">
+          <button class="btn-secondary" style="margin-bottom:10px" onclick="go('s-edit-notice')">Edit Notice</button>
+          <button class="btn-primary" onclick="submitNotice('s-success-notice')">Post Notice</button>
+        </div>
+      </div>
+
+      <!-- POST NOTICE (CANTEEN) -->
+      <div class="slide" id="s-post-notice-canteen">
+        <div class="app-header">
+          <span class="back-btn" onclick="go('s-dash-canteen')">←</span>
+          <span class="title">Post Notice</span>
+        </div>
+        <div class="login-form">
+          <h2>Post Notice</h2>
+          <div class="role-sub">Hall: hb • Canteen</div>
+          <label class="form-label">Type</label>
+          <select class="form-input">
+            <option value="delay">⏰ Delay</option>
+            <option value="closure">🔒 Closure</option>
+            <option value="shortage">⚠️ Shortage</option>
+            <option value="special">🎉 Special</option>
+          </select>
+          <label class="form-label">Title</label>
+          <input class="form-input" id="pnc-title" placeholder="Enter notice title">
+          <label class="form-label">Message</label>
+          <textarea class="form-input" id="pnc-msg" style="height:80px;resize:none"></textarea>
+          <label class="form-label">Expires in (hours)</label>
+          <input class="form-input" value="6" type="number" min="1" max="72">
+          <button class="btn-secondary" style="margin-bottom:10px" onclick="go('s-edit-notice-canteen')">Edit Notice</button>
+          <button class="btn-primary" onclick="submitNotice('s-success-notice-canteen','pnc-title','pnc-msg')">Post Notice</button>
+        </div>
+      </div>
+
+      <!-- EDIT NOTICE (DINING) -->
+      <div class="slide" id="s-edit-notice">
+        <div class="app-header">
+          <span class="back-btn" onclick="go('s-post-notice')">←</span>
+          <span class="title">Edit Notice</span>
+        </div>
+        <div class="login-form">
+          <h2>Edit Notice</h2>
+          <div class="role-sub">Hall: hb • Dining</div>
+          <label class="form-label">Type</label>
+          <input class="form-input" value="Delay">
+          <label class="form-label">Title</label>
+          <input class="form-input" value="Lunch Delay Notice">
+          <label class="form-label">Message</label>
+          <textarea class="form-input" style="height:80px;resize:none" placeholder="Enter message..."></textarea>
+          <label class="form-label">Expires in (hours)</label>
+          <input class="form-input" value="6">
+          <div style="display:flex;gap:10px;margin-top:8px">
+            <button class="btn-danger" onclick="go('s-post-notice')">Delete</button>
+            <button class="btn-primary" style="width:55%" onclick="go('s-success-notice')">Save Changes</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- EDIT NOTICE (CANTEEN) -->
+      <div class="slide" id="s-edit-notice-canteen">
+        <div class="app-header">
+          <span class="back-btn" onclick="go('s-post-notice-canteen')">←</span>
+          <span class="title">Edit Notice</span>
+        </div>
+        <div class="login-form">
+          <h2>Edit Notice</h2>
+          <div class="role-sub">Hall:hb.canteen</div>
+          <label class="form-label">Type</label>
+          <input class="form-input" value="Delay">
+          <label class="form-label">Title</label>
+          <input class="form-input" value="Lunch Delay Notice">
+          <label class="form-label">Message</label>
+          <textarea class="form-input" style="height:80px;resize:none" placeholder="Enter message..."></textarea>
+          <label class="form-label">Expires in (hours)</label>
+          <input class="form-input" value="6">
+          <div style="display:flex;gap:10px;margin-top:8px">
+            <button class="btn-danger" onclick="go('s-post-notice-canteen')">Delete</button>
+            <button class="btn-primary" style="width:55%" onclick="go('s-success-notice-canteen')">Save Changes</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- SUCCESS NOTICE DINING -->
+      <div class="slide" id="s-success-notice">
+        <div style="background:white;margin:20px 16px;border-radius:16px;padding:30px 24px;box-shadow:0 1px 8px rgba(0,0,0,0.08)">
+          <div class="success-screen" style="padding:20px 0 10px">
+            <div class="success-icon"><svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg></div>
+            <h2>Success</h2>
+            <p>Notice posted successfully.</p>
+            <button class="btn-primary" onclick="go('s-dash-dining')">Back to Dashboard</button>
+            <button class="btn-secondary" onclick="go('s-post-notice')">Edit Again</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- SUCCESS NOTICE CANTEEN -->
+      <div class="slide" id="s-success-notice-canteen">
+        <div style="background:white;margin:20px 16px;border-radius:16px;padding:30px 24px;box-shadow:0 1px 8px rgba(0,0,0,0.08)">
+          <div class="success-screen" style="padding:20px 0 10px">
+            <div class="success-icon"><svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg></div>
+            <h2>Success</h2>
+            <p>Notice posted successfully.</p>
+            <button class="btn-primary" onclick="go('s-dash-canteen')">Back to Dashboard</button>
+            <button class="btn-secondary" onclick="go('s-post-notice-canteen')">Edit Again</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- ADD FEAST (DINING) -->
+      <div class="slide" id="s-add-feast">
+        <div class="app-header">
+          <span class="back-btn" onclick="go('s-dash-dining')">←</span>
+          <span class="title">Add Feast</span>
+        </div>
+        <div class="login-form">
+          <h2>Add Feast</h2>
+          <div class="role-sub">Hall: hb • Dining</div>
+          <label class="form-label">Date (YYYY-MM-DD)</label>
+          <input class="form-input" value="2026-03-10">
+          <label class="form-label">Title</label>
+          <input class="form-input" value="Briyani Feast">
+          <label class="form-label">Time Range</label>
+          <input class="form-input" value="8:00 PM - 9:00 PM">
+          <label class="form-label">Menu</label>
+          <textarea class="form-input" style="height:70px;resize:none" placeholder="Enter feast menu items..."></textarea>
+          <label class="form-label">Price</label>
+          <input class="form-input" value="120">
+          <button class="btn-secondary" style="margin-bottom:10px" onclick="go('s-edit-feast')">Edit Feast</button>
+          <button class="btn-primary" onclick="go('s-success-feast')">Save Feast</button>
+        </div>
+      </div>
+
+      <!-- EDIT FEAST (DINING) -->
+      <div class="slide" id="s-edit-feast">
+        <div class="app-header">
+          <span class="back-btn" onclick="go('s-add-feast')">←</span>
+          <span class="title">Edit Feast</span>
+        </div>
+        <div class="login-form">
+          <h2>Edit Feast</h2>
+          <div class="role-sub">Hall: hb • Dining</div>
+          <label class="form-label">Date</label>
+          <input class="form-input" value="2026-03-20">
+          <label class="form-label">Title</label>
+          <input class="form-input" value="Briyani Feast">
+          <label class="form-label">Time Range</label>
+          <input class="form-input" value="8:00 PM - 9:00 PM">
+          <label class="form-label">Menu</label>
+          <textarea class="form-input" style="height:70px;resize:none" placeholder="Enter menu..."></textarea>
+          <label class="form-label">Price</label>
+          <input class="form-input" value="120">
+          <div style="display:flex;gap:10px;margin-top:8px">
+            <button class="btn-danger" onclick="go('s-add-feast')">Delete</button>
+            <button class="btn-primary" style="width:55%" onclick="go('s-success-feast')">Save Changes</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- ADD FEAST (CANTEEN) -->
+      <div class="slide" id="s-add-feast-canteen">
+        <div class="app-header">
+          <span class="back-btn" onclick="go('s-dash-canteen')">←</span>
+          <span class="title">Add Feast</span>
+        </div>
+        <div class="login-form">
+          <h2>Add Feast</h2>
+          <div class="role-sub">Hall: hb • Canteen</div>
+          <label class="form-label">Date (YYYY-MM-DD)</label>
+          <input class="form-input" value="2026-03-10">
+          <label class="form-label">Title</label>
+          <input class="form-input" value="Briyani Feast">
+          <label class="form-label">Time Range</label>
+          <input class="form-input" value="8:00 PM - 9:00 PM">
+          <label class="form-label">Menu</label>
+          <textarea class="form-input" style="height:70px;resize:none" placeholder="Enter feast menu items..."></textarea>
+          <label class="form-label">Price</label>
+          <input class="form-input" value="120">
+          <button class="btn-secondary" style="margin-bottom:10px" onclick="go('s-edit-feast-canteen')">Edit Feast</button>
+          <button class="btn-primary" onclick="go('s-success-feast-canteen')">Save Feast</button>
+        </div>
+      </div>
+
+      <!-- EDIT FEAST (CANTEEN) -->
+      <div class="slide" id="s-edit-feast-canteen">
+        <div class="app-header">
+          <span class="back-btn" onclick="go('s-add-feast-canteen')">←</span>
+          <span class="title">Edit Feast</span>
+        </div>
+        <div class="login-form">
+          <h2>Edit Feast</h2>
+          <div class="role-sub">Hall: hb • Canteen</div>
+          <label class="form-label">Date</label>
+          <input class="form-input" value="2026-03-20">
+          <label class="form-label">Title</label>
+          <input class="form-input" value="Briyani Feast">
+          <label class="form-label">Time Range</label>
+          <input class="form-input" value="8:00 PM - 9:00 PM">
+          <label class="form-label">Menu</label>
+          <textarea class="form-input" style="height:70px;resize:none" placeholder="Enter menu..."></textarea>
+          <label class="form-label">Price</label>
+          <input class="form-input" value="120">
+          <div style="display:flex;gap:10px;margin-top:8px">
+            <button class="btn-danger" onclick="go('s-add-feast-canteen')">Delete</button>
+            <button class="btn-primary" style="width:55%" onclick="go('s-success-feast-canteen')">Save Changes</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- SUCCESS FEAST DINING -->
+      <div class="slide" id="s-success-feast">
+        <div style="background:white;margin:20px 16px;border-radius:16px;padding:30px 24px;box-shadow:0 1px 8px rgba(0,0,0,0.08)">
+          <div class="success-screen" style="padding:20px 0 10px">
+            <div class="success-icon"><svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg></div>
+            <h2>Success</h2>
+            <p>Feast saved successfully.</p>
+            <button class="btn-primary" onclick="go('s-dash-dining')">Back to Dashboard</button>
+            <button class="btn-secondary" onclick="go('s-add-feast')">Edit Again</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- SUCCESS FEAST CANTEEN -->
+      <div class="slide" id="s-success-feast-canteen">
+        <div style="background:white;margin:20px 16px;border-radius:16px;padding:30px 24px;box-shadow:0 1px 8px rgba(0,0,0,0.08)">
+          <div class="success-screen" style="padding:20px 0 10px">
+            <div class="success-icon"><svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg></div>
+            <h2>Success</h2>
+            <p>Feast saved successfully.</p>
+            <button class="btn-primary" onclick="go('s-dash-canteen')">Back to Dashboard</button>
+            <button class="btn-secondary" onclick="go('s-add-feast-canteen')">Edit Again</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- DAILY RESET (DINING) -->
+      <div class="slide" id="s-daily-reset">
+        <div class="app-header">
+          <span class="back-btn" onclick="go('s-dash-dining')">←</span>
+          <span class="title">Daily Reset</span>
+        </div>
+        <div style="padding:16px 16px 4px;font-size:22px;font-weight:700;color:#1a1a1a">Start New Day</div>
+        <div style="padding:0 16px 20px;font-size:12px;color:#888">Hall: hb • Date: 2026-03-13</div>
+        <div class="card" style="margin-bottom:12px">
+          <div style="font-size:16px;font-weight:600;margin-bottom:6px">Duplicate Yesterday Menu</div>
+          <div style="font-size:13px;color:#888;margin-bottom:14px">Copy yesterday's menu as a starting point for today.</div>
+          <button class="btn-primary" onclick="go('s-success-dining')">Duplicate Yesterday</button>
+        </div>
+        <div class="card">
+          <div style="font-size:16px;font-weight:600;margin-bottom:6px">Clear All For Today</div>
+          <div style="font-size:13px;color:#888;margin-bottom:14px">Remove all previous menu items and start with an empty menu.</div>
+          <button style="width:100%;padding:14px;background:#fff3f3;color:#e53935;border:1.5px solid #ffcdd2;border-radius:12px;font-size:15px;font-weight:600;cursor:pointer" onclick="go('s-success-dining')">Clear Everything</button>
+        </div>
+      </div>
+
+      <!-- DAILY RESET (CANTEEN) -->
+      <div class="slide" id="s-daily-reset-canteen">
+        <div class="app-header">
+          <span class="back-btn" onclick="go('s-dash-canteen')">←</span>
+          <span class="title">Daily Reset</span>
+        </div>
+        <div style="padding:16px 16px 4px;font-size:22px;font-weight:700;color:#1a1a1a">Start New Day</div>
+        <div style="padding:0 16px 20px;font-size:12px;color:#888">Hall: hb • Date: 2026-03-13</div>
+        <div class="card" style="margin-bottom:12px">
+          <div style="font-size:16px;font-weight:600;margin-bottom:6px">Duplicate Yesterday Menu</div>
+          <div style="font-size:13px;color:#888;margin-bottom:14px">Copy yesterday's menu as a starting point for today.</div>
+          <button class="btn-primary" onclick="go('s-success-canteen')">Duplicate Yesterday</button>
+        </div>
+        <div class="card">
+          <div style="font-size:16px;font-weight:600;margin-bottom:6px">Clear All For Today</div>
+          <div style="font-size:13px;color:#888;margin-bottom:14px">Remove all previous menu items and start with an empty menu.</div>
+          <button style="width:100%;padding:14px;background:#fff3f3;color:#e53935;border:1.5px solid #ffcdd2;border-radius:12px;font-size:15px;font-weight:600;cursor:pointer" onclick="go('s-success-canteen')">Clear Everything</button>
+        </div>
+      </div>
+
+      <!-- VERIFICATION (DINING) -->
+      <div class="slide" id="s-verification">
+        <div class="app-header">
+          <span class="back-btn" onclick="go('s-dash-dining')">←</span>
+          <span class="title">Verification</span>
+        </div>
+        <div style="padding:16px 16px 4px;font-size:20px;font-weight:700;color:#1a1a1a">Verification Details</div>
+        <div style="padding:0 16px 12px;font-size:12px;color:#888">Hall: hb • Dining • Date: 2026-03-12</div>
+        <div class="card" style="margin-bottom:12px">
+          <div style="font-size:15px;font-weight:600;margin-bottom:12px">Current Record</div>
+          <table style="width:100%;font-size:13px;border-collapse:collapse">
+            <tr><td style="color:#888;padding:5px 0">Updated by</td><td style="text-align:right;font-weight:500">Abir Hasan</td></tr>
+            <tr><td style="color:#888;padding:5px 0">Role</td><td style="text-align:right;font-weight:500">Dining Moderator</td></tr>
+            <tr><td style="color:#888;padding:5px 0">Last updated</td><td style="text-align:right;font-weight:500">12 Mar 2026, 2:55 AM</td></tr>
+            <tr><td style="color:#888;padding:5px 0">Status</td><td style="text-align:right"><span style="background:#fff8e1;color:#f57f17;padding:3px 10px;border-radius:8px;font-size:11px;font-weight:600">Pending</span></td></tr>
+          </table>
+        </div>
+        <div class="card">
+          <div style="font-size:15px;font-weight:600;margin-bottom:12px">Update History</div>
+          <div style="border:1px solid #f0f0f0;border-radius:10px;padding:12px;margin-bottom:8px">
+            <div style="display:flex;justify-content:space-between;margin-bottom:4px">
+              <span style="font-size:13px;font-weight:600">Abir Hasan</span>
+              <span style="font-size:11px;color:#aaa">12 Mar 2026, 2:55 AM</span>
+            </div>
+            <div style="font-size:12px;color:#666;line-height:1.5">Updated lunch items and changed item status.</div>
+          </div>
+          <div style="border:1px solid #f0f0f0;border-radius:10px;padding:12px">
+            <div style="display:flex;justify-content:space-between;margin-bottom:4px">
+              <span style="font-size:13px;font-weight:600">Nafis Ahmed</span>
+              <span style="font-size:11px;color:#aaa">11 Mar 2026, 9:10 PM</span>
+            </div>
+            <div style="font-size:12px;color:#666;line-height:1.5">Added dinner menu and saved remaining quantity.</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- VERIFICATION (CANTEEN) -->
+      <div class="slide" id="s-verification-canteen">
+        <div class="app-header">
+          <span class="back-btn" onclick="go('s-dash-canteen')">←</span>
+          <span class="title">Verification</span>
+        </div>
+        <div style="padding:16px 16px 4px;font-size:20px;font-weight:700;color:#1a1a1a">Verification Details</div>
+        <div style="padding:0 16px 12px;font-size:12px;color:#888">Hall: hb • Canteen • Date: 2026-03-12</div>
+        <div class="card" style="margin-bottom:12px">
+          <div style="font-size:15px;font-weight:600;margin-bottom:12px">Current Record</div>
+          <table style="width:100%;font-size:13px;border-collapse:collapse">
+            <tr><td style="color:#888;padding:5px 0">Updated by</td><td style="text-align:right;font-weight:500">Abir Hasan</td></tr>
+            <tr><td style="color:#888;padding:5px 0">Role</td><td style="text-align:right;font-weight:500">Canteen Moderator</td></tr>
+            <tr><td style="color:#888;padding:5px 0">Last updated</td><td style="text-align:right;font-weight:500">12 Mar 2026, 2:55 AM</td></tr>
+            <tr><td style="color:#888;padding:5px 0">Status</td><td style="text-align:right"><span style="background:#fff8e1;color:#f57f17;padding:3px 10px;border-radius:8px;font-size:11px;font-weight:600">Pending</span></td></tr>
+          </table>
+        </div>
+        <div class="card">
+          <div style="font-size:15px;font-weight:600;margin-bottom:12px">Update History</div>
+          <div style="border:1px solid #f0f0f0;border-radius:10px;padding:12px;margin-bottom:8px">
+            <div style="display:flex;justify-content:space-between;margin-bottom:4px">
+              <span style="font-size:13px;font-weight:600">Abir Hasan</span>
+              <span style="font-size:11px;color:#aaa">12 Mar 2026, 2:55 AM</span>
+            </div>
+            <div style="font-size:12px;color:#666;line-height:1.5">Updated canteen items and changed item status.</div>
+          </div>
+          <div style="border:1px solid #f0f0f0;border-radius:10px;padding:12px">
+            <div style="display:flex;justify-content:space-between;margin-bottom:4px">
+              <span style="font-size:13px;font-weight:600">Nafis Ahmed</span>
+              <span style="font-size:11px;color:#aaa">11 Mar 2026, 9:10 PM</span>
+            </div>
+            <div style="font-size:12px;color:#666;line-height:1.5">Added canteen menu and saved remaining quantity.</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ===================== NEW: AVAILABLE FOOD MENU ===================== -->
+      <div class="slide" id="s-available-food">
+        <div class="app-header">
+          <span class="back-btn" id="avf-back-btn" onclick="go('s-dash-dining')">←</span>
+          <span class="title" id="avf-title">Available Food Menu</span>
+        </div>
+        <div style="padding:14px 16px 4px;font-size:18px;font-weight:700;color:#1a1a1a" id="avf-heading">Available Food Items</div>
+        <div style="padding:0 16px 10px;font-size:12px;color:#888" id="avf-subtitle">Live quantity • Tap – to serve one portion</div>
+        <!-- Meal tabs — shown only for dining role -->
+        <div class="meal-tabs" id="avf-tabs" style="display:none;margin-bottom:4px">
+          <div class="meal-tab active" id="avf-tab-breakfast" onclick="setAvfTab('breakfast')">Breakfast</div>
+          <div class="meal-tab" id="avf-tab-lunch" onclick="setAvfTab('lunch')">Lunch</div>
+          <div class="meal-tab" id="avf-tab-dinner" onclick="setAvfTab('dinner')">Dinner</div>
+        </div>
+        <div id="avf-list" style="padding:0 0 16px"></div>
+      </div>
+
+      <!-- ===================== NEW: FOOD DETAIL / REVIEW ===================== -->
+      <div class="slide" id="s-food-detail">
+        <div class="app-header">
+          <span class="back-btn" id="fdr-back-btn" onclick="go('s-dining-detail')">←</span>
+          <span class="title" id="fdr-title">Food Detail</span>
+        </div>
+        <!-- Food info card -->
+        <div class="hall-info-card" style="margin-bottom:8px">
+          <div style="display:flex;align-items:center;gap:14px">
+            <div style="width:52px;height:52px;border-radius:14px;background:#d8ead2;display:flex;align-items:center;justify-content:center;font-size:26px;flex-shrink:0" id="fdr-emoji">🍽️</div>
+            <div style="flex:1">
+              <h2 id="fdr-name" style="font-size:18px">Food Name</h2>
+              <div class="hall-meta" id="fdr-meta">Price • Category</div>
+              <div style="margin-top:5px;display:flex;align-items:center;gap:8px">
+                <span style="background:#e8f5e9;color:#2e7d32;font-size:12px;font-weight:700;padding:3px 10px;border-radius:8px" id="fdr-qty-badge">Remaining: —</span>
+                <span class="avg-rating" id="fdr-avg-rating" style="display:none">⭐ —</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Review Form -->
+        <div class="card" style="margin-bottom:10px">
+          <div style="font-size:15px;font-weight:700;color:#1a1a1a;margin-bottom:10px">⭐ Rate &amp; Review</div>
+          <div style="margin-bottom:10px">
+            <div style="font-size:13px;color:#555;font-weight:500;margin-bottom:6px">Your Rating</div>
+            <div id="fdr-stars" style="display:flex;gap:6px">
+              <span class="star-btn" data-val="1" onclick="setRating(1)" style="font-size:26px;cursor:pointer;opacity:0.35">★</span>
+              <span class="star-btn" data-val="2" onclick="setRating(2)" style="font-size:26px;cursor:pointer;opacity:0.35">★</span>
+              <span class="star-btn" data-val="3" onclick="setRating(3)" style="font-size:26px;cursor:pointer;opacity:0.35">★</span>
+              <span class="star-btn" data-val="4" onclick="setRating(4)" style="font-size:26px;cursor:pointer;opacity:0.35">★</span>
+              <span class="star-btn" data-val="5" onclick="setRating(5)" style="font-size:26px;cursor:pointer;opacity:0.35">★</span>
+            </div>
+          </div>
+          <div style="margin-bottom:10px">
+            <div style="font-size:13px;color:#555;font-weight:500;margin-bottom:6px">Comment</div>
+            <textarea id="fdr-comment" class="form-input" style="height:70px;resize:none;margin-bottom:0" placeholder="Share your thoughts about this food…"></textarea>
+          </div>
+          <button class="btn-primary" style="margin-bottom:0" onclick="submitReview()">Submit Review</button>
+          <div id="fdr-review-msg" style="display:none;text-align:center;font-size:13px;color:#2d6a4f;font-weight:600;margin-top:8px">✓ Review submitted!</div>
+        </div>
+
+        <!-- Previous Reviews -->
+        <div style="padding:0 16px 6px;font-size:14px;font-weight:700;color:#1a1a1a">All Reviews</div>
+        <div id="fdr-reviews-list" style="padding:0 0 20px">
+          <div style="text-align:center;padding:20px;font-size:13px;color:#aaa" id="fdr-no-reviews">No reviews yet. Be the first!</div>
+        </div>
+      </div>
+      <!-- ===================== END NEW SLIDES ===================== -->
+
+      <!-- (merged into specific success/preview pages above) -->
+
+      <!-- LOGOUT CONFIRM MODAL -->
+      <div id="logout-modal" style="display:none;position:absolute;inset:0;background:rgba(0,0,0,0.45);z-index:999;align-items:flex-end;justify-content:center">
+        <div style="background:white;border-radius:22px 22px 0 0;padding:24px 20px 32px;width:100%;box-shadow:0 -4px 24px rgba(0,0,0,0.15)">
+          <div style="text-align:center;margin-bottom:18px">
+            <div style="font-size:38px;margin-bottom:8px">👋</div>
+            <div style="font-size:18px;font-weight:700;color:#1a1a1a">Logout করবেন?</div>
+            <div style="font-size:13px;color:#888;margin-top:4px">আপনি কি সত্যিই logout করতে চান?</div>
+          </div>
+          <button onclick="confirmLogout()" style="width:100%;padding:15px;background:#e53935;color:white;border:none;border-radius:14px;font-size:16px;font-weight:700;cursor:pointer;margin-bottom:10px">✓ হ্যাঁ, Logout করুন</button>
+          <button onclick="hideLogout()" style="width:100%;padding:14px;background:#f2f2f7;color:#333;border:none;border-radius:14px;font-size:15px;font-weight:600;cursor:pointer">বাতিল করুন</button>
+        </div>
+      </div>
+
+    </div>
+  </div>
+  <div class="label" style="font-size:11px">Click any button to navigate • Scroll inside phone to see more</div>
+</div>
+
+<script>
+// ============ TOAST NOTIFICATION ============
+function showToast(msg, type) {
+  var container = document.getElementById('toast-container');
+  var toast = document.createElement('div');
+  toast.className = 'toast' + (type === 'success' ? ' toast-success' : type === 'error' ? ' toast-error' : '');
+  toast.textContent = msg;
+  container.appendChild(toast);
+  setTimeout(function(){ toast.classList.add('toast-show'); }, 10);
+  setTimeout(function(){
+    toast.classList.remove('toast-show');
+    setTimeout(function(){ toast.remove(); }, 300);
+  }, 2500);
+}
+
+// ============ NOTICE FORM VALIDATION ============
+function submitNotice(successSlide, titleId, msgId) {
+  titleId = titleId || 'pn-title';
+  msgId = msgId || 'pn-msg';
+  var title = document.getElementById(titleId);
+  var msg = document.getElementById(msgId);
+  if (title && !title.value.trim()) {
+    showToast('✏️ Notice title লিখুন', 'error');
+    title.focus();
+    return;
+  }
+  if (msg && !msg.value.trim()) {
+    showToast('✏️ Notice message লিখুন', 'error');
+    msg.focus();
+    return;
+  }
+  go(successSlide);
+  showToast('✓ Notice সফলভাবে পোস্ট হয়েছে', 'success');
+}
+
+// ============ QUICK STATUS CHIP TOGGLE ============
+function toggleStatusChip(el) {
+  var siblings = el.parentElement.querySelectorAll('.filter-chip');
+  siblings.forEach(function(s){ s.classList.remove('active'); });
+  el.classList.add('active');
+}
+
+function setBulkStatus(el, groupClass) {
+  // Activate this bulk btn
+  var bulkBtns = el.parentElement.querySelectorAll('.filter-chip');
+  bulkBtns.forEach(function(b){ b.classList.remove('active'); });
+  el.classList.add('active');
+
+  var statusText = el.textContent.replace('All ','').toLowerCase(); // available / low / finished
+  // Apply to all item rows under matching class
+  document.querySelectorAll('.' + groupClass).forEach(function(row) {
+    var chips = row.querySelectorAll('.filter-chip');
+    chips.forEach(function(c){ c.classList.remove('active'); });
+    chips.forEach(function(c){
+      if (c.textContent.toLowerCase() === statusText) c.classList.add('active');
+    });
+  });
+  showToast('✓ সব item → ' + el.textContent.replace('All ',''), 'success');
+}
+
+
+var _hallFilter = 'all';
+function setHallFilter(type) {
+  _hallFilter = type;
+  ['all','boys','girls'].forEach(function(t){
+    document.getElementById('fc-' + t).classList.toggle('active', t === type);
+  });
+  filterHalls();
+}
+function filterHalls() {
+  var query = (document.getElementById('hall-search-input').value || '').toLowerCase();
+  var cards = document.querySelectorAll('#halls-list-container .hall-card');
+  var anyVisible = false;
+  cards.forEach(function(card) {
+    var name = card.querySelector('h3').textContent.toLowerCase();
+    var type = card.getAttribute('data-type');
+    var matchFilter = _hallFilter === 'all' || type === _hallFilter;
+    var matchSearch = !query || name.includes(query);
+    var visible = matchFilter && matchSearch;
+    card.style.display = visible ? '' : 'none';
+    if (visible) anyVisible = true;
+  });
+  document.getElementById('halls-empty').style.display = anyVisible ? 'none' : 'block';
+}
+
+// ============ MEAL TABS ============
+function switchMealTab(tab) {
+  ['breakfast','lunch','dinner'].forEach(function(t) {
+    document.getElementById('tab-' + t).classList.toggle('active', t === tab);
+    var sec = document.getElementById('meal-section-' + t);
+    if (sec) sec.style.display = (t === tab) ? '' : 'none';
+  });
+}
+
+
+function showLogout(role) {
+  _logoutFrom = role;
+  var m = document.getElementById('logout-modal');
+  m.style.display = 'flex';
+}
+function hideLogout() {
+  document.getElementById('logout-modal').style.display = 'none';
+}
+function confirmLogout() {
+  hideLogout();
+  go('s-mod-select');
+}
+function go(id) {
+  document.querySelectorAll('.slide').forEach(function(s){ s.classList.remove('active'); });
+  var el = document.getElementById(id);
+  if (el) { el.classList.add('active'); el.scrollTop = 0; }
+  // When going to preview-dining, build preview content
+  if (id === 's-preview-dining') buildDiningPreview();
+  if (id === 's-preview-canteen') buildCanteenPreview();
+}
+function toggleAcc(id) {
+  var el = document.getElementById(id);
+  var arrow = document.getElementById(id + '-arrow');
+  if (el.style.display === 'block') {
+    el.style.display = 'none';
+    if (arrow) arrow.textContent = '∨';
+  } else {
+    el.style.display = 'block';
+    if (arrow) arrow.textContent = '∧';
+  }
+}
+
+// Add item row to a meal section
+var _itemCounters = {};
+function addMenuItemRow(containerId, mealType) {
+  var container = document.getElementById(containerId);
+  if (!container) return;
+  // Remove "no items yet" placeholder
+  var placeholder = container.querySelector('[data-placeholder]');
+  if (!placeholder) {
+    var divs = container.querySelectorAll('div');
+    divs.forEach(function(d){ if(d.textContent.trim() === 'No items yet') d.remove(); });
+  }
+  var key = containerId;
+  if (!_itemCounters[key]) _itemCounters[key] = 0;
+  _itemCounters[key]++;
+  var idx = _itemCounters[key];
+  var row = document.createElement('div');
+  row.id = 'item-row-' + containerId + '-' + idx;
+  row.style.cssText = 'border:1px solid #e8f5e9;border-radius:10px;padding:10px 12px;margin-bottom:8px;background:#fafffe;';
+  row.innerHTML =
+    '<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px">' +
+      '<span style="font-size:13px;font-weight:600;color:#2d6a4f">Item ' + idx + '</span>' +
+      '<span style="font-size:18px;color:#e53935;cursor:pointer;padding:0 4px;line-height:1" onclick="removeItemRow(\'' + containerId + '\',\'' + row.id + '\')">&times;</span>' +
+    '</div>' +
+    '<input class="form-input" style="margin-bottom:6px" placeholder="Item name (e.g. Briyani)" id="name-' + containerId + '-' + idx + '">' +
+    '<div style="display:flex;gap:8px;margin-bottom:6px">' +
+      '<input class="form-input" style="margin-bottom:0;width:50%" placeholder="Price (৳)" id="price-' + containerId + '-' + idx + '">' +
+      '<input class="form-input" style="margin-bottom:0;width:50%" placeholder="Remaining count" id="count-' + containerId + '-' + idx + '">' +
+    '</div>' +
+    '<div style="display:flex;gap:6px">' +
+      '<span class="filter-chip active" style="padding:4px 10px;font-size:12px;cursor:pointer" onclick="setStatus(this,\'available\')">Available</span>' +
+      '<span class="filter-chip" style="padding:4px 10px;font-size:12px;cursor:pointer" onclick="setStatus(this,\'low\')">Low</span>' +
+      '<span class="filter-chip" style="padding:4px 10px;font-size:12px;cursor:pointer" onclick="setStatus(this,\'finished\')">Finished</span>' +
+    '</div>';
+  container.appendChild(row);
+}
+
+function removeItemRow(containerId, rowId) {
+  var row = document.getElementById(rowId);
+  if (row) row.remove();
+  var container = document.getElementById(containerId);
+  if (container && container.children.length === 0) {
+    container.innerHTML = '<div style="font-size:13px;color:#aaa">No items yet</div>';
+    _itemCounters[containerId] = 0;
+  }
+}
+
+function setStatus(btn, status) {
+  var parent = btn.parentElement;
+  parent.querySelectorAll('.filter-chip').forEach(function(c){ c.classList.remove('active'); });
+  btn.classList.add('active');
+  btn.dataset.status = status;
+}
+
+function getItemsFromContainer(containerId) {
+  var container = document.getElementById(containerId);
+  if (!container) return [];
+  var items = [];
+  var rows = container.querySelectorAll('[id^="item-row-"]');
+  rows.forEach(function(row) {
+    var suffix = row.id.replace('item-row-' + containerId + '-', '');
+    var name = document.getElementById('name-' + containerId + '-' + suffix);
+    var price = document.getElementById('price-' + containerId + '-' + suffix);
+    var count = document.getElementById('count-' + containerId + '-' + suffix);
+    var statusBtns = row.querySelectorAll('.filter-chip.active');
+    var status = 'available';
+    if (statusBtns.length) {
+      var t = statusBtns[statusBtns.length-1].textContent.trim().toLowerCase();
+      if (t === 'low') status = 'low';
+      else if (t === 'finished') status = 'finished';
+      else status = 'available';
+    }
+    if (name && name.value.trim()) {
+      items.push({
+        name: name.value.trim(),
+        price: price ? price.value.trim() : '',
+        count: count ? count.value.trim() : '',
+        status: status
+      });
+    }
+  });
+  return items;
+}
+
+function renderMealSection(title, items) {
+  if (!items.length) return '';
+  var statusColors = { available:'#e8f5e9', low:'#fff8e1', finished:'#e3f2fd' };
+  var statusTextColors = { available:'#2e7d32', low:'#f57f17', finished:'#1565c0' };
+  var itemsHtml = items.map(function(it, i){
+    var sc = statusColors[it.status] || '#e8f5e9';
+    var tc = statusTextColors[it.status] || '#2e7d32';
+    var isLast = i === items.length - 1;
+    return '<div class="meal-item"' + (isLast ? ' style="border-radius:0 0 14px 14px"' : '') + '>' +
+      '<div><div class="meal-item-name">' + it.name + '</div>' +
+      '<div class="meal-item-meta">' + (it.price ? '৳'+it.price : '') + (it.count ? ' • Remaining: '+it.count : '') + '</div></div>' +
+      '<span class="meal-status" style="background:' + sc + ';color:' + tc + '">' + it.status.toUpperCase() + '</span>' +
+      '</div>';
+  }).join('');
+  var noteNames = items.map(function(it){ return it.name; }).join(', ');
+  return '<div class="meal-section">' +
+    '<div class="meal-section-header"><h3>' + title + '</h3></div>' +
+    itemsHtml +
+    '<div style="background:white;padding:10px 16px;border-top:1px solid #f5f5f5;border-radius:0 0 14px 14px;font-size:12px;color:#aaa">NOTE: ' + noteNames + '</div>' +
+    '</div>';
+}
+
+function buildDiningPreview() {
+  var breakfast = getItemsFromContainer('um-breakfast-items');
+  var lunch = getItemsFromContainer('um-lunch-items');
+  var dinner = getItemsFromContainer('um-dinner-items');
+  var html = '';
+  if (!breakfast.length && !lunch.length && !dinner.length) {
+    html = '<div style="text-align:center;padding:30px 16px;color:#aaa;font-size:14px">No items added yet. Go back and add items.</div>';
+  } else {
+    html += renderMealSection('Breakfast', breakfast);
+    html += renderMealSection('Lunch', lunch);
+    html += renderMealSection('Dinner', dinner);
+  }
+  document.getElementById('preview-dining-content').innerHTML = html;
+}
+
+function buildCanteenPreview() {
+  var canteen = getItemsFromContainer('uc-canteen-items');
+  var html = '';
+  if (!canteen.length) {
+    html = '<div style="text-align:center;padding:30px 16px;color:#aaa;font-size:14px">No items added yet. Go back and add items.</div>';
+  } else {
+    html += '<div class="meal-section">';
+    html += '<div class="meal-section-header"><h3>Hall Canteen</h3><span class="meal-status status-available">ACTIVE</span></div>';
+    canteen.forEach(function(it, i) {
+      var statusColors = {available:'#e8f5e9',low:'#fff8e1',finished:'#e3f2fd'};
+      var statusTextColors = {available:'#2e7d32',low:'#f57f17',finished:'#1565c0'};
+      var isLast = i === canteen.length - 1;
+      html += '<div class="meal-item"' + (isLast ? ' style="border-radius:0 0 14px 14px"' : '') + '>' +
+        '<div><div class="meal-item-name">' + it.name + '</div>' +
+        '<div class="meal-item-meta">' + (it.price ? '৳'+it.price : '') + (it.count ? ' • Remaining: '+it.count : '') + '</div></div>' +
+        '<span class="meal-status" style="background:' + (statusColors[it.status]||'#e8f5e9') + ';color:' + (statusTextColors[it.status]||'#2e7d32') + '">' + it.status.toUpperCase() + '</span>' +
+        '</div>';
+    });
+    var noteNames = canteen.map(function(it){ return it.name; }).join(', ');
+    html += '<div style="background:white;padding:10px 16px;border-top:1px solid #f5f5f5;border-radius:0 0 14px 14px;font-size:12px;color:#aaa">NOTE: ' + noteNames + '</div>';
+    html += '</div>';
+  }
+  document.getElementById('preview-canteen-content').innerHTML = html;
+}
+
+// =====================================================================
+// NEW FEATURE: Available Food Menu + Food Detail/Review System
+// =====================================================================
+
+// Role tracking: 'dining' | 'canteen' | 'student'
+var _currentRole = 'student';
+
+// Food data store (prototype arrays)
+var _foodItems = [
+  { id: 'vat',          name: 'Vat',          price: '৳10',  qty: 100, meal: 'breakfast', emoji: '🍚' },
+  { id: 'dim',          name: 'Dim',           price: '৳20',  qty: 80,  meal: 'breakfast', emoji: '🥚' },
+  { id: 'dal',          name: 'Dal',           price: '৳15',  qty: 60,  meal: 'lunch',     emoji: '🫕' },
+  { id: 'chicken',      name: 'Chicken Curry', price: '৳50',  qty: 45,  meal: 'lunch',     emoji: '🍗' },
+  { id: 'roti',         name: 'Roti',          price: '৳8',   qty: 120, meal: 'dinner',    emoji: '🫓' },
+  { id: 'briyani',      name: 'Briyani',       price: '৳50',  qty: 70,  meal: 'canteen',   emoji: '🍛' },
+  { id: 'pizza',        name: 'Pizza',         price: '৳100', qty: 30,  meal: 'canteen',   emoji: '🍕' },
+  { id: 'canteen_dim',  name: 'Dim (Canteen)', price: '৳20',  qty: 50,  meal: 'canteen',   emoji: '🥚' }
+];
+
+// Reviews store: { [foodId]: [{name, rating, comment, date}] }
+var _reviews = {
+  vat:     [{ name: 'Rahim', rating: 4, comment: 'Good quality rice!', date: '2026-04-10' }],
+  chicken: [{ name: 'Karim', rating: 5, comment: 'Very tasty curry!', date: '2026-04-11' }],
+  briyani: [{ name: 'Sadia', rating: 5, comment: 'Best biryani in campus!', date: '2026-04-12' }]
+};
+
+var _currentFoodId = null;
+var _currentReviewRating = 0;
+var _avfFromRole = 'dining';
+var _avfActiveMeal = 'breakfast'; // active tab for dining role
+
+function openAvailableFood(role) {
+  _avfFromRole = role;
+  _currentRole = role;
+  var backTarget;
+  if (role === 'dining') backTarget = 's-dash-dining';
+  else if (role === 'canteen') backTarget = 's-dash-canteen';
+  else backTarget = 's-halls';
+  document.getElementById('avf-back-btn').setAttribute('onclick', "go('" + backTarget + "')");
+
+  // Update title & heading based on role
+  var titleEl = document.getElementById('avf-title');
+  var headingEl = document.getElementById('avf-heading');
+  var tabsEl = document.getElementById('avf-tabs');
+
+  if (role === 'dining') {
+    if (titleEl) titleEl.textContent = 'Dining Food Menu';
+    if (headingEl) headingEl.textContent = 'Dining Food Items';
+    // Show tabs, reset to breakfast
+    if (tabsEl) tabsEl.style.display = 'flex';
+    _avfActiveMeal = 'breakfast';
+    ['breakfast','lunch','dinner'].forEach(function(t) {
+      var tab = document.getElementById('avf-tab-' + t);
+      if (tab) tab.classList.toggle('active', t === 'breakfast');
+    });
+  } else if (role === 'canteen') {
+    if (titleEl) titleEl.textContent = 'Canteen Food Menu';
+    if (headingEl) headingEl.textContent = 'Canteen Food Items';
+    if (tabsEl) tabsEl.style.display = 'none';
+  } else {
+    if (titleEl) titleEl.textContent = 'Available Food Menu';
+    if (headingEl) headingEl.textContent = 'Available Food Items';
+    if (tabsEl) tabsEl.style.display = 'none';
+  }
+
+  renderAvailableFoodList();
+  go('s-available-food');
+}
+
+function setAvfTab(meal) {
+  _avfActiveMeal = meal;
+  ['breakfast','lunch','dinner'].forEach(function(t) {
+    var tab = document.getElementById('avf-tab-' + t);
+    if (tab) tab.classList.toggle('active', t === meal);
+  });
+  renderAvailableFoodList();
+}
+
+function renderAvailableFoodList() {
+  var isAdmin = (_currentRole === 'dining' || _currentRole === 'canteen');
+  var isDiningMod = (_currentRole === 'dining');
+  var isCanteenMod = (_currentRole === 'canteen');
+
+  var list = document.getElementById('avf-list');
+  var subtitle = document.getElementById('avf-subtitle');
+  subtitle.textContent = isAdmin
+    ? 'Live quantity • Tap − to serve one portion'
+    : 'Tap a food item to view details and leave a review';
+
+  // Role-based meal filter:
+  // dining moderator → only the active tab meal (breakfast/lunch/dinner)
+  // canteen moderator → only canteen
+  // student → all meals
+  var allowedMeals;
+  if (isDiningMod) {
+    allowedMeals = [_avfActiveMeal]; // single active tab
+  } else if (isCanteenMod) {
+    allowedMeals = ['canteen'];
+  } else {
+    allowedMeals = ['breakfast', 'lunch', 'dinner', 'canteen'];
+  }
+
+  var html = '';
+  var mealLabels = { breakfast: '🌅 Breakfast', lunch: '☀️ Lunch', dinner: '🌙 Dinner', canteen: '🏪 Canteen' };
+
+  allowedMeals.forEach(function(meal) {
+    var items = _foodItems.filter(function(f){ return f.meal === meal && f.qty >= 0; });
+    if (!items.length) {
+      // Show empty state per tab for dining mod
+      if (isDiningMod) {
+        html += '<div style="text-align:center;padding:40px 16px;font-size:13px;color:#aaa">No ' + meal + ' items added yet.</div>';
+      }
+      return;
+    }
+    // Only show section header if NOT dining mod (tabs already show the meal name)
+    if (!isDiningMod) {
+      html += '<div style="font-size:13px;font-weight:700;color:#888;padding:10px 16px 4px;text-transform:uppercase;letter-spacing:0.5px">' + mealLabels[meal] + '</div>';
+    }
+    items.forEach(function(food) {
+      var qtyColor = food.qty > 30 ? '#2e7d32' : food.qty > 10 ? '#f57f17' : '#e53935';
+      var qtyBg   = food.qty > 30 ? '#e8f5e9' : food.qty > 10 ? '#fff8e1' : '#ffebee';
+      var qtyLabel = food.qty > 0 ? 'Remaining: ' + food.qty : 'FINISHED';
+
+      var cardClick = isAdmin ? '' : 'onclick="openFoodDetailFromAVF(\'' + food.id + '\')" style="cursor:pointer"';
+      html += '<div class="card" ' + cardClick + ' style="margin-bottom:10px;display:flex;align-items:center;gap:12px' + (isAdmin ? '' : ';cursor:pointer') + '">';
+      html += '<div style="font-size:28px;flex-shrink:0">' + food.emoji + '</div>';
+      html += '<div style="flex:1">';
+      html += '<div style="font-size:15px;font-weight:600;color:#1a1a1a">' + food.name + '</div>';
+      html += '<div style="font-size:12px;color:#888;margin-top:2px">' + food.price + '</div>';
+      html += '<div style="margin-top:6px"><span style="background:' + qtyBg + ';color:' + qtyColor + ';font-size:11px;font-weight:700;padding:3px 9px;border-radius:8px" id="avf-qty-' + food.id + '">' + qtyLabel + '</span></div>';
+      html += '</div>';
+      if (isAdmin) {
+        html += '<button onclick="serveFood(\'' + food.id + '\')" style="width:34px;height:34px;border-radius:50%;background:#2d6a4f;color:white;font-size:20px;font-weight:700;border:none;cursor:pointer;display:flex;align-items:center;justify-content:center;flex-shrink:0;line-height:1" title="Serve 1 portion">−</button>';
+      } else {
+        html += '<span style="color:#bbb;font-size:18px;flex-shrink:0">›</span>';
+      }
+      html += '</div>';
+    });
+  });
+
+  if (!html) {
+    html = '<div style="text-align:center;padding:30px;font-size:13px;color:#aaa">No food items available yet.</div>';
+  }
+  list.innerHTML = html;
+}
+
+function serveFood(foodId) {
+  var food = _foodItems.find(function(f){ return f.id === foodId; });
+  if (!food) return;
+  if (food.qty <= 0) {
+    showToast('⚠️ ' + food.name + ' already finished!', 'error');
+    return;
+  }
+  food.qty = Math.max(0, food.qty - 1);
+  var badge = document.getElementById('avf-qty-' + foodId);
+  if (badge) {
+    var qtyColor = food.qty > 30 ? '#2e7d32' : food.qty > 10 ? '#f57f17' : '#e53935';
+    var qtyBg   = food.qty > 30 ? '#e8f5e9' : food.qty > 10 ? '#fff8e1' : '#ffebee';
+    var qtyLabel = food.qty > 0 ? 'Remaining: ' + food.qty : 'FINISHED';
+    badge.style.background = qtyBg;
+    badge.style.color = qtyColor;
+    badge.textContent = qtyLabel;
+    badge.classList.remove('qty-pulse');
+    void badge.offsetWidth; // reflow
+    badge.classList.add('qty-pulse');
+  }
+  if (food.qty === 0) showToast('🔴 ' + food.name + ' is now finished!', 'error');
+  else if (food.qty <= 10) showToast('⚠️ ' + food.name + ': only ' + food.qty + ' left', '');
+  else showToast('✓ Served 1 portion of ' + food.name, 'success');
+}
+
+// ---- Food Detail / Review System ----
+var _foodDetailBackSlide = 's-available-food';
+
+// Called by ID directly (for canteen items that share names with dining items)
+function openFoodDetailById(foodId) {
+  var food = _foodItems.find(function(f){ return f.id === foodId; });
+  if (!food) return;
+  openFoodDetailFromAVF(foodId);
+  // Override back button to go to canteen detail
+  document.getElementById('fdr-back-btn').setAttribute('onclick', "go('s-canteen-detail')");
+}
+
+// Called when tapping a food from the Available Food Menu (student)
+function openFoodDetailFromAVF(foodId) {
+  var food = _foodItems.find(function(f){ return f.id === foodId; });
+  if (!food) return;
+  _currentFoodId = food.id;
+  _currentReviewRating = 0;
+  document.getElementById('fdr-back-btn').setAttribute('onclick', "go('s-available-food')");
+  document.getElementById('fdr-title').textContent = food.name;
+  document.getElementById('fdr-name').textContent = food.name;
+  document.getElementById('fdr-meta').textContent = food.price + ' • ' + (food.meal.charAt(0).toUpperCase() + food.meal.slice(1));
+  document.getElementById('fdr-emoji').textContent = food.emoji;
+  var qtyColor = food.qty > 30 ? '#2e7d32' : food.qty > 10 ? '#f57f17' : '#e53935';
+  var qtyBg   = food.qty > 30 ? '#e8f5e9' : food.qty > 10 ? '#fff8e1' : '#ffebee';
+  var qtyBadge = document.getElementById('fdr-qty-badge');
+  qtyBadge.style.background = qtyBg;
+  qtyBadge.style.color = qtyColor;
+  qtyBadge.textContent = food.qty > 0 ? 'Remaining: ' + food.qty : 'FINISHED';
+  document.getElementById('fdr-comment').value = '';
+  document.getElementById('fdr-review-msg').style.display = 'none';
+  setRating(0);
+  renderReviews(food.id);
+  updateAvgRatingBadge(food.id);
+  go('s-food-detail');
+}
+
+function openFoodDetail(name, price, qty, meal) {
+  // Find food in store or create temp
+  var food = _foodItems.find(function(f){ return f.name === name; });
+  if (!food) {
+    food = { id: name.toLowerCase().replace(/\s/g,'_'), name: name, price: price, qty: parseInt(qty)||0, meal: meal, emoji: '🍽️' };
+    _foodItems.push(food);
+  }
+  _currentFoodId = food.id;
+  _currentReviewRating = 0;
+
+  // Set back button target based on meal type
+  var backSlide = (meal === 'canteen') ? 's-canteen-detail' : 's-dining-detail';
+  document.getElementById('fdr-back-btn').setAttribute('onclick', "go('" + backSlide + "')");
+
+  // Populate food info
+  document.getElementById('fdr-title').textContent = food.name;
+  document.getElementById('fdr-name').textContent = food.name;
+  document.getElementById('fdr-meta').textContent = food.price + ' • ' + (food.meal.charAt(0).toUpperCase() + food.meal.slice(1));
+  document.getElementById('fdr-emoji').textContent = food.emoji;
+
+  var qtyColor = food.qty > 30 ? '#2e7d32' : food.qty > 10 ? '#f57f17' : '#e53935';
+  var qtyBg   = food.qty > 30 ? '#e8f5e9' : food.qty > 10 ? '#fff8e1' : '#ffebee';
+  var qtyBadge = document.getElementById('fdr-qty-badge');
+  qtyBadge.style.background = qtyBg;
+  qtyBadge.style.color = qtyColor;
+  qtyBadge.textContent = food.qty > 0 ? 'Remaining: ' + food.qty : 'FINISHED';
+
+  // Reset form
+  document.getElementById('fdr-comment').value = '';
+  document.getElementById('fdr-review-msg').style.display = 'none';
+  setRating(0);
+
+  // Render reviews
+  renderReviews(food.id);
+  updateAvgRatingBadge(food.id);
+  go('s-food-detail');
+}
+
+function setRating(val) {
+  _currentReviewRating = val;
+  var stars = document.querySelectorAll('#fdr-stars .star-btn');
+  stars.forEach(function(s, i) {
+    s.style.opacity = (i < val) ? '1' : '0.3';
+    s.style.color = (i < val) ? '#f59e0b' : '#999';
+  });
+}
+
+function submitReview() {
+  if (!_currentFoodId) return;
+  if (_currentReviewRating === 0) {
+    showToast('⭐ আগে একটি rating দিন', 'error');
+    return;
+  }
+  var comment = document.getElementById('fdr-comment').value.trim();
+  if (!comment) {
+    showToast('💬 একটি comment লিখুন', 'error');
+    return;
+  }
+  if (!_reviews[_currentFoodId]) _reviews[_currentFoodId] = [];
+  var today = new Date();
+  var dateStr = today.getFullYear() + '-' + String(today.getMonth()+1).padStart(2,'0') + '-' + String(today.getDate()).padStart(2,'0');
+  _reviews[_currentFoodId].unshift({
+    name: 'You',
+    rating: _currentReviewRating,
+    comment: comment,
+    date: dateStr
+  });
+  document.getElementById('fdr-comment').value = '';
+  setRating(0);
+  document.getElementById('fdr-review-msg').style.display = 'block';
+  setTimeout(function(){ document.getElementById('fdr-review-msg').style.display = 'none'; }, 2500);
+  showToast('✓ Review জমা হয়েছে!', 'success');
+  renderReviews(_currentFoodId);
+  updateAvgRatingBadge(_currentFoodId);
+}
+
+function updateAvgRatingBadge(foodId) {
+  var reviews = _reviews[foodId] || [];
+  var badge = document.getElementById('fdr-avg-rating');
+  if (!badge) return;
+  if (!reviews.length) { badge.style.display = 'none'; return; }
+  var avg = reviews.reduce(function(s,r){ return s+r.rating; }, 0) / reviews.length;
+  badge.style.display = 'inline-flex';
+  badge.textContent = '⭐ ' + avg.toFixed(1) + ' (' + reviews.length + ')';
+}
+
+function renderReviews(foodId) {
+  var container = document.getElementById('fdr-reviews-list');
+  var reviews = _reviews[foodId] || [];
+  if (!reviews.length) {
+    container.innerHTML = '<div style="text-align:center;padding:20px;font-size:13px;color:#aaa">No reviews yet. Be the first!</div>';
+    updateAvgRatingBadge(foodId);
+    return;
+  }
+  var html = '';
+  reviews.forEach(function(r) {
+    var stars = '';
+    for (var i=1;i<=5;i++) {
+      stars += '<span style="color:' + (i<=r.rating?'#f59e0b':'#ddd') + ';font-size:15px">★</span>';
+    }
+    html += '<div class="card" style="margin-bottom:10px">';
+    html += '<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:5px">';
+    html += '<div style="font-size:13px;font-weight:700;color:#1a1a1a">' + r.name + '</div>';
+    html += '<div style="font-size:11px;color:#aaa">' + r.date + '</div>';
+    html += '</div>';
+    html += '<div style="margin-bottom:5px">' + stars + '</div>';
+    html += '<div style="font-size:13px;color:#444;line-height:1.5">' + r.comment + '</div>';
+    html += '</div>';
+  });
+  container.innerHTML = html;
+  updateAvgRatingBadge(foodId);
+}
+</script>
+</body>
+</html>

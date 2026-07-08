@@ -1,0 +1,120 @@
+<svg viewBox="0 0 1100 680" xmlns="http://www.w3.org/2000/svg" font-family="Arial, sans-serif">
+  <rect width="1100" height="680" fill="#F8FAFC" rx="12"/>
+  <!-- Title bar -->
+  <rect x="0" y="0" width="1100" height="48" fill="#1E40AF" rx="12"/>
+  <rect x="0" y="36" width="1100" height="12" fill="#1E40AF"/>
+  <text x="550" y="31" text-anchor="middle" fill="white" font-size="18" font-weight="bold">HallMenu RU — System Architecture</text>
+
+  <!-- ══ LAYER 1: CLIENT LAYER ══ -->
+  <rect x="20" y="70" width="1060" height="160" fill="#EFF6FF" rx="10" stroke="#93C5FD" stroke-width="1.5"/>
+  <text x="40" y="94" fill="#1E40AF" font-size="13" font-weight="bold">CLIENT LAYER</text>
+
+  <!-- Student Phone -->
+  <rect x="50" y="105" width="160" height="110" fill="white" rx="8" stroke="#3B82F6" stroke-width="2"/>
+  <text x="130" y="130" text-anchor="middle" fill="#1E40AF" font-size="22">📱</text>
+  <text x="130" y="152" text-anchor="middle" fill="#1E293B" font-size="12" font-weight="bold">Student</text>
+  <text x="130" y="168" text-anchor="middle" fill="#64748B" font-size="11">HallMenu RU App</text>
+  <text x="130" y="184" text-anchor="middle" fill="#64748B" font-size="10">View menus, feasts</text>
+  <text x="130" y="198" text-anchor="middle" fill="#64748B" font-size="10">notices, hall info</text>
+
+  <!-- Dining Moderator Phone -->
+  <rect x="250" y="105" width="160" height="110" fill="white" rx="8" stroke="#8B5CF6" stroke-width="2"/>
+  <text x="330" y="130" text-anchor="middle" fill="#7C3AED" font-size="22">🛡️</text>
+  <text x="330" y="152" text-anchor="middle" fill="#1E293B" font-size="12" font-weight="bold">Dining Moderator</text>
+  <text x="330" y="168" text-anchor="middle" fill="#64748B" font-size="11">HallMenu RU App</text>
+  <text x="330" y="184" text-anchor="middle" fill="#64748B" font-size="10">Update menus, quick</text>
+  <text x="330" y="198" text-anchor="middle" fill="#64748B" font-size="10">status, feasts, notices</text>
+
+  <!-- Canteen Moderator Phone -->
+  <rect x="450" y="105" width="160" height="110" fill="white" rx="8" stroke="#F59E0B" stroke-width="2"/>
+  <text x="530" y="130" text-anchor="middle" fill="#D97706" font-size="22">🛒</text>
+  <text x="530" y="152" text-anchor="middle" fill="#1E293B" font-size="12" font-weight="bold">Canteen Moderator</text>
+  <text x="530" y="168" text-anchor="middle" fill="#64748B" font-size="11">HallMenu RU App</text>
+  <text x="530" y="184" text-anchor="middle" fill="#64748B" font-size="10">Update canteen items</text>
+  <text x="530" y="198" text-anchor="middle" fill="#64748B" font-size="10">stock count, status</text>
+
+  <!-- React Native Info -->
+  <rect x="660" y="105" width="390" height="110" fill="#DBEAFE" rx="8" stroke="#93C5FD" stroke-width="1.5"/>
+  <text x="855" y="128" text-anchor="middle" fill="#1E40AF" font-size="13" font-weight="bold">Frontend Framework</text>
+  <text x="680" y="150" fill="#1E293B" font-size="12" font-weight="bold">React Native + Expo</text>
+  <text x="680" y="168" fill="#475569" font-size="11">• Expo Router (file-based navigation)</text>
+  <text x="680" y="184" fill="#475569" font-size="11">• React Hooks (useState, useEffect)</text>
+  <text x="680" y="200" fill="#475569" font-size="11">• AsyncStorage (onboarding flag)</text>
+
+  <!-- Arrow: Client to App Layer -->
+  <line x1="550" y1="232" x2="550" y2="268" stroke="#6366F1" stroke-width="2.5" marker-end="url(#arrow)"/>
+  <text x="560" y="256" fill="#6366F1" font-size="11" font-weight="bold">HTTPS / Firebase SDK</text>
+
+  <!-- ══ LAYER 2: APPLICATION LAYER ══ -->
+  <rect x="20" y="270" width="1060" height="140" fill="#F5F3FF" rx="10" stroke="#C4B5FD" stroke-width="1.5"/>
+  <text x="40" y="294" fill="#6D28D9" font-size="13" font-weight="bold">APPLICATION LAYER — Repository Pattern (repository.js)</text>
+
+  <rect x="50" y="305" width="180" height="90" fill="white" rx="8" stroke="#8B5CF6" stroke-width="1.5"/>
+  <text x="140" y="326" text-anchor="middle" fill="#6D28D9" font-size="11" font-weight="bold">Menu Module</text>
+  <text x="140" y="343" text-anchor="middle" fill="#475569" font-size="10">getMenu()</text>
+  <text x="140" y="358" text-anchor="middle" fill="#475569" font-size="10">saveDiningMenu()</text>
+  <text x="140" y="373" text-anchor="middle" fill="#475569" font-size="10">saveCanteenMenu()</text>
+  <text x="140" y="388" text-anchor="middle" fill="#475569" font-size="10">quickUpdate*()</text>
+
+  <rect x="260" y="305" width="180" height="90" fill="white" rx="8" stroke="#8B5CF6" stroke-width="1.5"/>
+  <text x="350" y="326" text-anchor="middle" fill="#6D28D9" font-size="11" font-weight="bold">Notice Module</text>
+  <text x="350" y="343" text-anchor="middle" fill="#475569" font-size="10">getNotices()</text>
+  <text x="350" y="358" text-anchor="middle" fill="#475569" font-size="10">postNotice()</text>
+  <text x="350" y="373" text-anchor="middle" fill="#475569" font-size="10">updateNotice()</text>
+  <text x="350" y="388" text-anchor="middle" fill="#475569" font-size="10">deleteNotice()</text>
+
+  <rect x="470" y="305" width="180" height="90" fill="white" rx="8" stroke="#8B5CF6" stroke-width="1.5"/>
+  <text x="560" y="326" text-anchor="middle" fill="#6D28D9" font-size="11" font-weight="bold">Feast Module</text>
+  <text x="560" y="343" text-anchor="middle" fill="#475569" font-size="10">getFeasts()</text>
+  <text x="560" y="358" text-anchor="middle" fill="#475569" font-size="10">addFeast()</text>
+  <text x="560" y="373" text-anchor="middle" fill="#475569" font-size="10">updateFeast()</text>
+  <text x="560" y="388" text-anchor="middle" fill="#475569" font-size="10">deleteFeast()</text>
+
+  <rect x="680" y="305" width="180" height="90" fill="white" rx="8" stroke="#8B5CF6" stroke-width="1.5"/>
+  <text x="770" y="326" text-anchor="middle" fill="#6D28D9" font-size="11" font-weight="bold">Moderator Module</text>
+  <text x="770" y="343" text-anchor="middle" fill="#475569" font-size="10">getModeratorData()</text>
+  <text x="770" y="358" text-anchor="middle" fill="#475569" font-size="10">logUpdate()</text>
+  <text x="770" y="373" text-anchor="middle" fill="#475569" font-size="10">getUpdateHistory()</text>
+
+  <rect x="890" y="305" width="160" height="90" fill="white" rx="8" stroke="#8B5CF6" stroke-width="1.5"/>
+  <text x="970" y="326" text-anchor="middle" fill="#6D28D9" font-size="11" font-weight="bold">Auth Module</text>
+  <text x="970" y="343" text-anchor="middle" fill="#475569" font-size="10">signIn()</text>
+  <text x="970" y="358" text-anchor="middle" fill="#475569" font-size="10">signOut()</text>
+  <text x="970" y="373" text-anchor="middle" fill="#475569" font-size="10">Firebase Auth SDK</text>
+
+  <!-- Arrow -->
+  <line x1="550" y1="412" x2="550" y2="448" stroke="#6366F1" stroke-width="2.5" marker-end="url(#arrow)"/>
+  <text x="560" y="435" fill="#6366F1" font-size="11" font-weight="bold">Firestore SDK Calls</text>
+
+  <!-- ══ LAYER 3: BACKEND / FIREBASE ══ -->
+  <rect x="20" y="450" width="1060" height="155" fill="#FFF7ED" rx="10" stroke="#FCD34D" stroke-width="1.5"/>
+  <text x="40" y="474" fill="#B45309" font-size="13" font-weight="bold">BACKEND LAYER — Google Firebase (Cloud)</text>
+
+  <rect x="50" y="485" width="200" height="100" fill="white" rx="8" stroke="#F59E0B" stroke-width="2"/>
+  <text x="150" y="508" text-anchor="middle" fill="#D97706" font-size="22">🔐</text>
+  <text x="150" y="530" text-anchor="middle" fill="#1E293B" font-size="12" font-weight="bold">Firebase Auth</text>
+  <text x="150" y="547" text-anchor="middle" fill="#475569" font-size="10">Email/Password login</text>
+  <text x="150" y="562" text-anchor="middle" fill="#475569" font-size="10">Moderator identity</text>
+  <text x="150" y="577" text-anchor="middle" fill="#475569" font-size="10">Role verification</text>
+
+  <rect x="290" y="485" width="480" height="100" fill="white" rx="8" stroke="#F59E0B" stroke-width="2"/>
+  <text x="530" y="508" text-anchor="middle" fill="#D97706" font-size="22">🗄️</text>
+  <text x="530" y="530" text-anchor="middle" fill="#1E293B" font-size="12" font-weight="bold">Cloud Firestore (NoSQL Database)</text>
+  <text x="310" y="548" fill="#475569" font-size="10">Collections: menus | notices | feasts | moderators | updateHistory | foodReviews</text>
+  <text x="310" y="563" fill="#475569" font-size="10">Document IDs: hallId_dateKey (menus) | auto-ID (others)</text>
+  <text x="310" y="578" fill="#64748B" font-size="10">Real-time reads via getDoc() / getDocs() | Writes via setDoc() / updateDoc() / addDoc()</text>
+
+  <rect x="810" y="485" width="240" height="100" fill="white" rx="8" stroke="#F59E0B" stroke-width="2"/>
+  <text x="930" y="508" text-anchor="middle" fill="#D97706" font-size="22">☁️</text>
+  <text x="930" y="530" text-anchor="middle" fill="#1E293B" font-size="12" font-weight="bold">Firebase Hosting</text>
+  <text x="930" y="547" text-anchor="middle" fill="#475569" font-size="10">Project: ru-dine</text>
+  <text x="930" y="562" text-anchor="middle" fill="#475569" font-size="10">Region: Global CDN</text>
+  <text x="930" y="577" text-anchor="middle" fill="#475569" font-size="10">No custom server needed</text>
+
+  <!-- Arrow defs -->
+  <defs>
+    <marker id="arrow" markerWidth="10" markerHeight="7" refX="10" refY="3.5" orient="auto">
+      <polygon points="0 0, 10 3.5, 0 7" fill="#6366F1"/>
+    </marker>
+  </defs>
+</svg>
