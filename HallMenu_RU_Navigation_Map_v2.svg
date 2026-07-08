@@ -1,0 +1,251 @@
+<svg viewBox="0 0 2560 2020" xmlns="http://www.w3.org/2000/svg" font-family="Arial, Helvetica, sans-serif">
+  <defs>
+    <marker id="arrowPurple" markerWidth="10" markerHeight="10" refX="8" refY="3" orient="auto" markerUnits="strokeWidth">
+      <path d="M0,0 L9,3 L0,6 Z" fill="#6a4fd6"/>
+    </marker>
+    <marker id="arrowGreen" markerWidth="10" markerHeight="10" refX="8" refY="3" orient="auto" markerUnits="strokeWidth">
+      <path d="M0,0 L9,3 L0,6 Z" fill="#3a8358"/>
+    </marker>
+    <marker id="arrowGray" markerWidth="10" markerHeight="10" refX="8" refY="3" orient="auto" markerUnits="strokeWidth">
+      <path d="M0,0 L9,3 L0,6 Z" fill="#6b6b76"/>
+    </marker>
+    <marker id="arrowBlue" markerWidth="10" markerHeight="10" refX="8" refY="3" orient="auto" markerUnits="strokeWidth">
+      <path d="M0,0 L9,3 L0,6 Z" fill="#3949ab"/>
+    </marker>
+    <marker id="arrowPink" markerWidth="10" markerHeight="10" refX="8" refY="3" orient="auto" markerUnits="strokeWidth">
+      <path d="M0,0 L9,3 L0,6 Z" fill="#d6447e"/>
+    </marker>
+    <marker id="arrowOrange" markerWidth="10" markerHeight="10" refX="8" refY="3" orient="auto" markerUnits="strokeWidth">
+      <path d="M0,0 L9,3 L0,6 Z" fill="#e2792f"/>
+    </marker>
+  </defs>
+
+  <!-- Background -->
+  <rect x="0" y="0" width="2560" height="2020" fill="#f4f5f9"/>
+
+  <!-- Header -->
+  <rect x="0" y="0" width="2560" height="105" fill="#2637a8"/>
+  <text x="1280" y="58" font-size="42" font-weight="800" fill="#ffffff" text-anchor="middle">HallMenu RU — Screen Navigation Map</text>
+  <text x="1280" y="88" font-size="16" fill="#c7cdf5" text-anchor="middle">v2 — full moderator screen set (Available Food, Post/Edit Notice, Post/Edit Feast — Dining + Canteen)</text>
+
+  <!-- ================= NODES (unchanged top section) ================= -->
+
+  <!-- index.js -->
+  <rect x="1055" y="150" width="320" height="90" rx="16" fill="#3949ab"/>
+  <text x="1215" y="192" font-size="24" font-weight="800" fill="#fff" text-anchor="middle">index.js</text>
+  <text x="1215" y="220" font-size="15" fill="#dfe2f7" text-anchor="middle">SplashScreen</text>
+
+  <!-- Onboarding -->
+  <rect x="500" y="150" width="210" height="90" rx="16" fill="#7c6ce0"/>
+  <text x="605" y="203" font-size="22" font-weight="800" fill="#fff" text-anchor="middle">Onboarding</text>
+
+  <!-- Home -->
+  <rect x="1655" y="150" width="210" height="90" rx="16" fill="#3949ab"/>
+  <text x="1760" y="203" font-size="22" font-weight="800" fill="#fff" text-anchor="middle">Home</text>
+
+  <!-- HallList -->
+  <rect x="478" y="435" width="275" height="95" rx="16" fill="#3a8358"/>
+  <text x="615" y="478" font-size="22" font-weight="800" fill="#fff" text-anchor="middle">HallList</text>
+  <text x="615" y="503" font-size="14" fill="#dcefe3" text-anchor="middle">17 halls, search</text>
+
+  <!-- FoodSearch -->
+  <rect x="1350" y="435" width="275" height="95" rx="16" fill="#3a8358"/>
+  <text x="1487" y="478" font-size="22" font-weight="800" fill="#fff" text-anchor="middle">FoodSearch</text>
+  <text x="1487" y="503" font-size="14" fill="#dcefe3" text-anchor="middle">Global search, all halls</text>
+
+  <!-- Feast -->
+  <rect x="983" y="435" width="210" height="95" rx="16" fill="#e2a238"/>
+  <text x="1088" y="490" font-size="22" font-weight="800" fill="#fff" text-anchor="middle">Feast</text>
+
+  <!-- Notices -->
+  <rect x="983" y="580" width="210" height="95" rx="16" fill="#e2792f"/>
+  <text x="1088" y="635" font-size="22" font-weight="800" fill="#fff" text-anchor="middle">Notices</text>
+
+  <!-- HallDetail -->
+  <rect x="453" y="618" width="325" height="95" rx="16" fill="#4fbb8a"/>
+  <text x="615" y="661" font-size="22" font-weight="800" fill="#fff" text-anchor="middle">HallDetail</text>
+  <text x="615" y="686" font-size="14" fill="#e4f7ee" text-anchor="middle">Dining + Canteen tabs</text>
+
+  <!-- ModeratorRole -->
+  <rect x="1863" y="435" width="335" height="95" rx="16" fill="#6a4fd6"/>
+  <text x="2030" y="478" font-size="22" font-weight="800" fill="#fff" text-anchor="middle">ModeratorRole</text>
+  <text x="2030" y="503" font-size="14" fill="#e6e1fa" text-anchor="middle">Dining / Canteen</text>
+
+  <!-- ModeratorLogin -->
+  <rect x="1863" y="632" width="335" height="95" rx="16" fill="#6a4fd6"/>
+  <text x="2030" y="675" font-size="22" font-weight="800" fill="#fff" text-anchor="middle">ModeratorLogin</text>
+  <text x="2030" y="700" font-size="14" fill="#e6e1fa" text-anchor="middle">Firebase Auth</text>
+
+  <!-- Dashboard -->
+  <rect x="1838" y="800" width="385" height="100" rx="16" fill="#4a2fb8"/>
+  <text x="2030" y="845" font-size="24" font-weight="800" fill="#fff" text-anchor="middle">Moderator Dashboard</text>
+  <text x="2030" y="870" font-size="14" fill="#dcd6f7" text-anchor="middle">isDining ? Dining menu : Canteen menu</text>
+
+  <!-- ================= EDGES (unchanged top section) ================= -->
+
+  <line x1="1055" y1="195" x2="712" y2="195" stroke="#7a7a86" stroke-width="2.5" stroke-dasharray="8,6" marker-end="url(#arrowGray)"/>
+  <text x="880" y="180" font-size="15" fill="#555" text-anchor="middle">first visit</text>
+
+  <line x1="1375" y1="195" x2="1653" y2="195" stroke="#7a7a86" stroke-width="2.5" stroke-dasharray="8,6" marker-end="url(#arrowGray)"/>
+  <text x="1515" y="180" font-size="15" fill="#555" text-anchor="middle">returning</text>
+
+  <line x1="605" y1="240" x2="605" y2="330" stroke="#6a4fd6" stroke-width="2.5"/>
+  <line x1="605" y1="330" x2="1760" y2="330" stroke="#6a4fd6" stroke-width="2.5"/>
+  <line x1="1760" y1="240" x2="1760" y2="330" stroke="#6a4fd6" stroke-width="2.5"/>
+
+  <line x1="1758" y1="330" x2="700" y2="435" stroke="#3a8358" stroke-width="2.5" marker-end="url(#arrowGreen)"/>
+  <text x="1230" y="365" font-size="16" font-weight="700" fill="#3a8358" text-anchor="middle">Student role</text>
+
+  <line x1="1760" y1="330" x2="2020" y2="433" stroke="#6a4fd6" stroke-width="2.5" marker-end="url(#arrowPurple)"/>
+  <text x="1930" y="378" font-size="16" font-weight="700" fill="#6a4fd6" text-anchor="middle">Mod role</text>
+
+  <line x1="753" y1="465" x2="981" y2="470" stroke="#3a8358" stroke-width="2.5" marker-end="url(#arrowGreen)"/>
+  <line x1="753" y1="500" x2="981" y2="610" stroke="#3a8358" stroke-width="2.5" marker-end="url(#arrowGreen)"/>
+  <line x1="753" y1="480" x2="1348" y2="478" stroke="#3a8358" stroke-width="2.5" marker-end="url(#arrowGreen)"/>
+  <line x1="615" y1="530" x2="615" y2="616" stroke="#3a8358" stroke-width="2.5" marker-end="url(#arrowGreen)"/>
+
+  <line x1="2030" y1="530" x2="2030" y2="630" stroke="#6a4fd6" stroke-width="2.5" marker-end="url(#arrowPurple)"/>
+  <line x1="2030" y1="727" x2="2030" y2="798" stroke="#6a4fd6" stroke-width="2.5" marker-end="url(#arrowPurple)"/>
+
+  <!-- ================= NEW: MODERATOR SUB-SCREENS (tree/branch layout) ================= -->
+
+  <!-- Trunk lines from Dashboard down to each group -->
+  <line x1="1940" y1="900" x2="530" y2="965" stroke="#6a4fd6" stroke-width="2.5"/>
+  <line x1="1980" y1="900" x2="820" y2="965" stroke="#6a4fd6" stroke-width="2.5"/>
+  <line x1="2030" y1="900" x2="1110" y2="965" stroke="#e2792f" stroke-width="2.5"/>
+
+  <!-- Group label headers -->
+  <text x="670" y="945" font-size="17" font-weight="800" fill="#6a4fd6" text-anchor="middle">Dining-only tools</text>
+  <text x="960" y="945" font-size="17" font-weight="800" fill="#d6447e" text-anchor="middle">Canteen-only tools</text>
+  <text x="1260" y="945" font-size="17" font-weight="800" fill="#e2792f" text-anchor="middle">Shared tools (Dining + Canteen)</text>
+
+  <!-- Trunk A (Dining) -->
+  <line x1="530" y1="965" x2="530" y2="1177" stroke="#6a4fd6" stroke-width="2.5"/>
+  <!-- Trunk B (Canteen) -->
+  <line x1="820" y1="965" x2="820" y2="1177" stroke="#d6447e" stroke-width="2.5"/>
+  <!-- Trunk C (Shared) -->
+  <line x1="1110" y1="965" x2="1110" y2="1567" stroke="#e2792f" stroke-width="2.5"/>
+
+  <!-- Branch stubs -->
+  <line x1="530" y1="1047" x2="560" y2="1047" stroke="#6a4fd6" stroke-width="2.5" marker-end="url(#arrowPurple)"/>
+  <line x1="530" y1="1177" x2="560" y2="1177" stroke="#6a4fd6" stroke-width="2.5" marker-end="url(#arrowPurple)"/>
+
+  <line x1="820" y1="1047" x2="850" y2="1047" stroke="#d6447e" stroke-width="2.5" marker-end="url(#arrowPink)"/>
+  <line x1="820" y1="1177" x2="850" y2="1177" stroke="#d6447e" stroke-width="2.5" marker-end="url(#arrowPink)"/>
+
+  <line x1="1110" y1="1047" x2="1140" y2="1047" stroke="#e2792f" stroke-width="2.5" marker-end="url(#arrowOrange)"/>
+  <line x1="1110" y1="1177" x2="1140" y2="1177" stroke="#e2792f" stroke-width="2.5" marker-end="url(#arrowOrange)"/>
+  <line x1="1110" y1="1307" x2="1140" y2="1307" stroke="#e2792f" stroke-width="2.5" marker-end="url(#arrowOrange)"/>
+  <line x1="1110" y1="1437" x2="1140" y2="1437" stroke="#e2792f" stroke-width="2.5" marker-end="url(#arrowOrange)"/>
+  <line x1="1110" y1="1567" x2="1140" y2="1567" stroke="#e2792f" stroke-width="2.5" marker-end="url(#arrowOrange)"/>
+
+  <!-- Stack A: Dining-only -->
+  <rect x="560" y="1000" width="220" height="95" rx="16" fill="#6a4fd6"/>
+  <text x="670" y="1040" font-size="19" font-weight="800" fill="#fff" text-anchor="middle">QuickStatus</text>
+  <text x="670" y="1063" font-size="13" fill="#e6e1fa" text-anchor="middle">Dining • bulk/item status</text>
+
+  <rect x="560" y="1130" width="220" height="95" rx="16" fill="#6a4fd6"/>
+  <text x="670" y="1170" font-size="19" font-weight="800" fill="#fff" text-anchor="middle">MenuEditor</text>
+  <text x="670" y="1193" font-size="13" fill="#e6e1fa" text-anchor="middle">Dining • full menu B/L/D</text>
+
+  <!-- Stack B: Canteen-only -->
+  <rect x="850" y="1000" width="220" height="95" rx="16" fill="#d6447e"/>
+  <text x="960" y="1040" font-size="19" font-weight="800" fill="#fff" text-anchor="middle">CanteenQuick</text>
+  <text x="960" y="1063" font-size="13" fill="#f9dce7" text-anchor="middle">Status • bulk/item status</text>
+
+  <rect x="850" y="1130" width="220" height="95" rx="16" fill="#d6447e"/>
+  <text x="960" y="1170" font-size="19" font-weight="800" fill="#fff" text-anchor="middle">CanteenEditor</text>
+  <text x="960" y="1193" font-size="13" fill="#f9dce7" text-anchor="middle">Menu • add/edit items</text>
+
+  <!-- Stack C: Shared -->
+  <rect x="1140" y="1000" width="240" height="95" rx="16" fill="#2f8f8f"/>
+  <text x="1260" y="1040" font-size="19" font-weight="800" fill="#fff" text-anchor="middle">AvailableFood</text>
+  <text x="1260" y="1063" font-size="13" fill="#d6f0f0" text-anchor="middle">Dining+Canteen • serve (−1)</text>
+
+  <rect x="1140" y="1130" width="240" height="95" rx="16" fill="#e2792f"/>
+  <text x="1260" y="1170" font-size="19" font-weight="800" fill="#fff" text-anchor="middle">NoticeEditor</text>
+  <text x="1260" y="1193" font-size="13" fill="#fde3d0" text-anchor="middle">Post Notice • both roles</text>
+
+  <rect x="1140" y="1260" width="240" height="95" rx="16" fill="#e2792f"/>
+  <text x="1260" y="1300" font-size="19" font-weight="800" fill="#fff" text-anchor="middle">FeastEditor</text>
+  <text x="1260" y="1323" font-size="13" fill="#fde3d0" text-anchor="middle">Post Feast • both roles</text>
+
+  <rect x="1140" y="1390" width="240" height="95" rx="16" fill="#5a5a68"/>
+  <text x="1260" y="1430" font-size="19" font-weight="800" fill="#fff" text-anchor="middle">DailyReset</text>
+  <text x="1260" y="1453" font-size="13" fill="#e6e6ea" text-anchor="middle">Duplicate/Clear • both roles</text>
+
+  <rect x="1140" y="1520" width="240" height="95" rx="16" fill="#2a2a3a"/>
+  <text x="1260" y="1560" font-size="19" font-weight="800" fill="#fff" text-anchor="middle">Verification</text>
+  <text x="1260" y="1583" font-size="13" fill="#d8d8e0" text-anchor="middle">Update history • both roles</text>
+
+  <!-- Edit children: EditNotice / EditFeast (branch right from NoticeEditor / FeastEditor) -->
+  <line x1="1380" y1="1177" x2="1420" y2="1177" stroke="#f0975a" stroke-width="2.5" marker-end="url(#arrowOrange)"/>
+  <text x="1400" y="1163" font-size="12" fill="#c9660e" text-anchor="middle">"Edit Notice" btn</text>
+
+  <line x1="1380" y1="1307" x2="1420" y2="1307" stroke="#f0975a" stroke-width="2.5" marker-end="url(#arrowOrange)"/>
+  <text x="1400" y="1293" font-size="12" fill="#c9660e" text-anchor="middle">"Edit Feast" btn</text>
+
+  <rect x="1420" y="1130" width="220" height="95" rx="16" fill="#f0975a"/>
+  <text x="1530" y="1170" font-size="19" font-weight="800" fill="#fff" text-anchor="middle">EditNotice</text>
+  <text x="1530" y="1193" font-size="13" fill="#fff0e6" text-anchor="middle">Edit/Delete latest</text>
+
+  <rect x="1420" y="1260" width="220" height="95" rx="16" fill="#f0975a"/>
+  <text x="1530" y="1300" font-size="19" font-weight="800" fill="#fff" text-anchor="middle">EditFeast</text>
+  <text x="1530" y="1323" font-size="13" fill="#fff0e6" text-anchor="middle">Edit/Delete latest</text>
+
+  <!-- Return-to-Dashboard dashed edges (router.back() / replace after save-delete) -->
+  <line x1="780" y1="1047" x2="1838" y2="850" stroke="#7a7a86" stroke-width="2" stroke-dasharray="7,6" marker-end="url(#arrowGray)"/>
+  <text x="1230" y="920" font-size="13" fill="#666" text-anchor="middle">Save → back()</text>
+
+  <line x1="1070" y1="1047" x2="1838" y2="860" stroke="#7a7a86" stroke-width="2" stroke-dasharray="7,6" marker-end="url(#arrowGray)"/>
+
+  <line x1="1380" y1="1437" x2="1838" y2="870" stroke="#7a7a86" stroke-width="2" stroke-dasharray="7,6" marker-end="url(#arrowGray)"/>
+
+  <line x1="1640" y1="1177" x2="2020" y2="900" stroke="#7a7a86" stroke-width="2" stroke-dasharray="7,6" marker-end="url(#arrowGray)"/>
+  <text x="1900" y="1010" font-size="13" fill="#666" text-anchor="middle">Save/Delete → replace(Dashboard)</text>
+
+  <line x1="1640" y1="1307" x2="2000" y2="900" stroke="#7a7a86" stroke-width="2" stroke-dasharray="7,6" marker-end="url(#arrowGray)"/>
+
+  <!-- ================= SuccessScreen ================= -->
+
+  <rect x="900" y="1700" width="370" height="100" rx="16" fill="#3a8358"/>
+  <text x="1085" y="1750" font-size="24" font-weight="800" fill="#fff" text-anchor="middle">SuccessScreen</text>
+  <text x="1085" y="1775" font-size="13" fill="#dcefe3" text-anchor="middle">shown after Save actions</text>
+
+  <line x1="670" y1="1225" x2="960" y2="1700" stroke="#3a8358" stroke-width="2.5" marker-end="url(#arrowGreen)"/>
+  <line x1="960" y1="1225" x2="1020" y2="1700" stroke="#3a8358" stroke-width="2.5" marker-end="url(#arrowGreen)"/>
+  <line x1="1260" y1="1225" x2="1120" y2="1700" stroke="#3a8358" stroke-width="2.5" marker-end="url(#arrowGreen)"/>
+  <line x1="1260" y1="1355" x2="1180" y2="1700" stroke="#3a8358" stroke-width="2.5" marker-end="url(#arrowGreen)"/>
+  <text x="1000" y="1660" font-size="14" font-weight="700" fill="#3a8358" text-anchor="middle">Save Menu / Post Notice / Save Feast</text>
+
+  <!-- SuccessScreen -> Dashboard (Back to Dashboard, solid) -->
+  <line x1="1270" y1="1730" x2="1836" y2="890" stroke="#3a8358" stroke-width="2.5" marker-end="url(#arrowGreen)"/>
+  <text x="1650" y="1330" font-size="14" font-weight="700" fill="#3a8358" text-anchor="middle">"Back to Dashboard"</text>
+
+  <!-- SuccessScreen -> Edit Again (dashed, router.back to originating editor) -->
+  <line x1="900" y1="1740" x2="670" y2="1230" stroke="#7a7a86" stroke-width="2" stroke-dasharray="7,6" marker-end="url(#arrowGray)"/>
+  <text x="740" y="1500" font-size="13" fill="#666" text-anchor="middle">"Edit Again" → back()</text>
+
+  <!-- ================= LEGEND ================= -->
+  <rect x="40" y="1720" width="500" height="270" rx="14" fill="#ffffff" stroke="#d7d9e3" stroke-width="2"/>
+  <text x="290" y="1760" font-size="24" font-weight="800" fill="#1a1a2e" text-anchor="middle">Legend</text>
+
+  <rect x="70" y="1780" width="35" height="35" rx="7" fill="#3a8358"/>
+  <text x="120" y="1805" font-size="19" fill="#333">Student screens</text>
+
+  <rect x="70" y="1828" width="35" height="35" rx="7" fill="#6a4fd6"/>
+  <text x="120" y="1853" font-size="19" fill="#333">Moderator — Dining-only tools</text>
+
+  <rect x="330" y="1828" width="35" height="35" rx="7" fill="#d6447e"/>
+  <text x="380" y="1853" font-size="19" fill="#333">Canteen-only</text>
+
+  <rect x="70" y="1876" width="35" height="35" rx="7" fill="#e2792f"/>
+  <text x="120" y="1901" font-size="19" fill="#333">Shared mod. tool (both roles)</text>
+
+  <rect x="70" y="1924" width="35" height="35" rx="7" fill="#f0975a"/>
+  <text x="120" y="1949" font-size="19" fill="#333">Edit/Delete sub-screen</text>
+
+  <line x1="330" y1="1980" x2="365" y2="1980" stroke="#7a7a86" stroke-width="2.5" stroke-dasharray="8,6"/>
+  <text x="380" y="1987" font-size="19" fill="#333">Conditional / back() nav</text>
+
+</svg>
